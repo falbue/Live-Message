@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+
+<main>
+    <div class="friend-block">
+        <div id="displayMessage" class="friend">Ожидаем сообщение от друга</div>
+    </div>
+    <div class="message-block">
+        <textarea id="inputMessage" class="message" placeholder="Введите сообщение..."></textarea>
+    </div>
+</main>
+<script>
+    const socket = io();
+
+    const inputMessage = document.getElementById('inputMessage');
+    const displayMessage = document.getElementById('displayMessage');
+
+    // Функция для замены новых строк на <br> теги
+    function formatMessage(message) {
+        return message.replace(/\n/g, '<br>');
+    }
+
+    // Отправляем сообщение при каждом изменении ввода
+    inputMessage.addEventListener('input', () => {
+        socket.emit('update_message', { text: inputMessage.value });
+    });
+
+    // Обновляем текстовое сообщение при получении данных
+    socket.on('receive_message', (data) => {
+        displayMessage.innerHTML = formatMessage(data.text);  // Используем innerHTML для поддержания <br>
+    });
+</script>
+
+{% endblock %}
