@@ -9,7 +9,7 @@
 		<div>
 			<h1>Пустой чат</h1>
 			<h2>Пиши сообщения, не отправляя их!</h2>
-			<a href="/chat" class="button">Перейти</a>
+			<a href="{{ url_for('chat', chat_id=chat_id) }}" class="button">Перейти</a>
 		</div>
 	</div>
 </main>
