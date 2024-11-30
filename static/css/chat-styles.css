@@ -85,8 +85,29 @@ body {
 .message:focus {outline: none;}
 
 
-button{
+#shareButton {
     position: absolute;
+    right: 20px; /* отступ от правого края */
+    bottom: 20px; /* отступ от нижнего края (или top, если нужно сверху) */
     z-index: 100;
-    
+    background-color: rgba(0, 0, 0, 0.2);
+    border: none;
+    padding: 6px;
+    border-radius: 4px;
+    width: 36px;
+    height: 36px;
+}
+
+svg{
+    fill: var(--text-color);
+    stroke-width: 0.3px;
+    stroke: var(--text-color);
+    color: var(--text-color);
+}
+
+path{
+    fill: var(--text-color);
+/*    stroke-width: 0.3px;*/
+    stroke: var(--text-color);
+    color: var(--text-color);
 }
