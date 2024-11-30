@@ -1,33 +1,20 @@
-/*цвета*/
-:root {
-  --border-radius: 12px;
-  --bg-second-color: #4C3A7D; /* второй фон для тёмной темы */
-  --text-color: #E8D7FF; /* светлый текст для тёмной темы */
-  --text-disabled-color: #A28CBA; /* тусклый текст для неактивных элементов */
-  --button: #9B4DFF; /* яркая кнопка */
-  --bg-menu: #5A3D8D; /* меню */
-  --bg-input: #5F3B8A; /* меню */
-  --text-color: #E8D7FF;
-}
 
-/* Стили для тёмной темы */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-color: #1A1A1A; /* фон для тёмной темы */
-    --text-color: #E8D7FF;
+    --bg-color: #1A1A1A;
     --bg-adaptive: #5F3B8A;
+    --text-color: #E8D7FF;
   }
 }
 
 /* Стили для светлой темы */
 @media (prefers-color-scheme: light) {
   :root {
-    --text-adaptive: #1A1A1A; /* фон для тёмной темы */
-    --bg-color: #E8D7FF
+    --text-color: #1A1A1A;
+    --bg-color: #E8D7FF;
+    --bg-adaptive: #5F3B8A;
   }
 }
-
-
 
 
 * {
@@ -49,28 +36,38 @@ body {
     height: 100%;
 }
 
-.friend-block,
-.message-block {
-    display: flex;
-    width: 100%;
-    height: 50vh; /* Устанавливаем высоту каждого блока на 50% от высоты экрана */
+.chat {
+    overflow: hidden; /* Скрывает скролл и предотвращает прокрутку */
+    width: 100%;      /* Опционально: ширина чата */
+    height: 100%;     /* Опционально: высота чата */
 }
 
+.friend-block {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 50vh;
+}
+
+.message-block {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 50vh;
+}
 .friend-block {
     background-color: var(--bg-adaptive);
     border-radius: 0 0 12px 12px;
     box-shadow: 0px 6px 4px 0px rgba(0, 0, 0, 0.25);
 }
 
-.message-block {
-    
-}
+.message-block {}
 
 .friend {
     font-size: 24px;
     color: var(--text-color);
     padding: 20px;
-    flex-grow: 1; /* Заставляет .friend занимать оставшееся пространство */
+    flex-grow: 1;
 }
 
 .message {
@@ -82,9 +79,7 @@ body {
     height: 100%;
     border: none;
     resize: none;
-    box-sizing: border-box; /* Чтобы padding не увеличивал высоту */
+    box-sizing: border-box;
 }
 
-.message:focus {
-    outline: none; /* Убирает обводку при фокусе */
-}
+.message:focus {outline: none;}
