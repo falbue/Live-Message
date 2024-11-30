@@ -83,3 +83,10 @@ body {
 }
 
 .message:focus {outline: none;}
+
+
+button{
+    position: absolute;
+    z-index: 100;
+    
+}

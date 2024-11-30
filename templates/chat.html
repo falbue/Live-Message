@@ -4,7 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chat-styles.css') }}">
-
+<button id="shareButton">Поделиться ссылкой</button>
 <main class="chat">
     <div class="friend-block">
         <div id="displayMessage" class="friend">Ожидание...</div>
@@ -15,4 +15,5 @@
 </main>
 
 <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/share.js') }}"></script>
 {% endblock %}
