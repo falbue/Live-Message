@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+
+<main>
+    <div class="friend-block">
+        <div id="displayMessage" class="friend">Ожидание...</div>
+    </div>
+    <div class="message-block">
+        <textarea id="inputMessage" class="message" placeholder="Введите сообщение..."></textarea>
+    </div>
+</main>
+
+<script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+{% endblock %}
