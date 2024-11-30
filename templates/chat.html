@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Главная{% endblock %}
+{% block title %}Чат{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chat-styles.css') }}">
 
 <main class="chat">
     <div class="friend-block">

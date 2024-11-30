@@ -1,0 +1,28 @@
+:root {
+  --border-radius: 12px;
+  --bg-second-color: #4C3A7D; /* второй фон для тёмной темы */
+  --text-color: #E8D7FF; /* светлый текст для тёмной темы */
+  --text-disabled-color: #A28CBA; /* тусклый текст для неактивных элементов */
+  --button: #9B4DFF; /* яркая кнопка */
+  --bg-menu: #5A3D8D; /* меню */
+  --bg-input: #5F3B8A; /* меню */
+  --text-button: #E8D7FF;
+}
+
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #1A1A1A;
+    --bg-adaptive: #5F3B8A;
+    --text-color: #E8D7FF;
+  }
+}
+
+/* Стили для светлой темы */
+@media (prefers-color-scheme: light) {
+  :root {
+    --text-color: #1A1A1A;
+    --bg-color: #E8D7FF;
+    --bg-adaptive: #5F3B8A;
+  }
+}
