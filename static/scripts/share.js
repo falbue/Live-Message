@@ -3,8 +3,8 @@ document.getElementById('shareButton').addEventListener('click', function() {
     if (navigator.share) {
       // Для мобильных устройств и браузеров, поддерживающих Share API
       navigator.share({
-        title: 'Название страницы',
-        text: 'Описание или комментарий',
+        title: 'free chat',
+        text: 'Приглашение в чат\n',
         url: window.location.href
       })
       .then(() => console.log('Ссылка успешно поделена'))
