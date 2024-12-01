@@ -1,0 +1,32 @@
+@media (max-width: 768px) {
+    .notification {
+        top: auto;
+        bottom: 20px;
+    }
+
+    #shareButton {
+        top: auto !important;
+        bottom: 20px;
+    }
+
+    .index h1{font-size: 48px}
+    .index h2{font-size: 18px}
+    .index a{
+        position: fixed;
+        bottom: 10px;
+        font-size: 20px;
+        width: 200px;
+        margin-top: 60px;
+        left: 50%; /* если нужно выравнивание по центру */
+        transform: translateX(-50%); /* для точного центрирования */
+    }
+
+    textarea::placeholder {
+        position: absolute;
+        bottom: 20px;
+    }
+
+    textarea:focus::placeholder {
+      opacity: 0;
+    }
+}
