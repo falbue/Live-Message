@@ -1,9 +1,7 @@
 const socket = io();
 const chatId = window.location.pathname.split('/').pop(); // Получаем chat_id из URL
-
 const inputMessage = document.getElementById('inputMessage');
 const displayMessage = document.getElementById('displayMessage');
-
 const senderId = Math.random().toString(36).substr(2, 9); // Генерация уникального идентификатора
 
 // Функция для замены новых строк на <br> теги
@@ -11,15 +9,8 @@ function formatMessage(message) {
     return message.replace(/\n/g, '<br>');
 }
 
-// Соединяемся с соответствующей комнатой
-socket.emit('join_chat', { chat_id: chatId });
-
-function formatMessage(message) {
-    // Заменяем текст с обратными кавычками на блоки с кодом
-    const codePattern = /`([^`]+)`/g;
-    message = message.replace(codePattern, '<div class="block-code"><code>$1</code></div>'); // Класс для подсветки
-    return message.replace(/\n/g, '<br>');
-}
+// Соединяемся с соответствующей комнатой и отправляем сообщение о подключении
+socket.emit('join_chat', { chat_id: chatId, sender_id: senderId });
 
 // Отправляем сообщение при каждом изменении ввода
 inputMessage.addEventListener('input', () => {

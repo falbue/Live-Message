@@ -17,8 +17,11 @@ def chat(chat_id):
 @socketio.on('join_chat')
 def on_join(data):
     chat_id = data['chat_id']
-    join_room(chat_id)  # подключаем клиента к комнате с chat_id
+    sender_id = data['sender_id']
+    join_room(chat_id)  # Подключаем клиента к комнате с chat_id
     print(f'Client joined chat {chat_id}')
+    socketio.emit('receive_message', {'text': 'Пользователь подключился!', 'sender_id': sender_id}, room=chat_id)
+
 
 @socketio.on('update_message')
 def handle_message(data):
