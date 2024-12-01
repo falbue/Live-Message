@@ -4,11 +4,6 @@
         bottom: 20px;
     }
 
-    #shareButton {
-        top: auto !important;
-        bottom: 20px;
-    }
-
     .index h1{font-size: 48px}
     .index h2{font-size: 18px}
     .index a{
@@ -28,7 +23,21 @@
 
     textarea:focus::placeholder {
       opacity: 0;
-    }
+  }
 
-    .block-code{width: 100% !important;}
+  .block-code{width: 100% !important;}
+
+  button,
+  .button:hover {transform: translateX(-50%) scale(1.01) !important;}
+
+  button,
+  .button:active {transform: translateX(-50%) scale(0.98) !important;}
+
+  .block-icon{
+    top: auto !important;
+    right: 10px !important ;
+    bottom: 10px;
+    flex-direction: column-reverse !important;
+}
+
 }
