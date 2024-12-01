@@ -4,11 +4,12 @@ const inputMessage = document.getElementById('inputMessage');
 const displayMessage = document.getElementById('displayMessage');
 const senderId = Math.random().toString(36).substr(2, 9); // Генерация уникального идентификатора
 
-// Функция для замены новых строк на <br> теги
 function formatMessage(message) {
-    return message.replace(/\n/g, '<br>');
+    // Заменяем текст, заключённый в обратные кавычки на блоки с кодом
+    const codePattern = /`([^`]+)`/g; // Захватываем текст, заключённый в обратные кавычки
+    message = message.replace(codePattern, '<div class="block-code"><code>$1</code></div>'); // Класс для подсветки
+    return message.replace(/\n/g, '<br>'); // Заменяем переносы строк
 }
-
 // Соединяемся с соответствующей комнатой и отправляем сообщение о подключении
 socket.emit('join_chat', { chat_id: chatId, sender_id: senderId });
 
