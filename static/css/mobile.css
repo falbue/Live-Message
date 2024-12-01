@@ -29,4 +29,6 @@
     textarea:focus::placeholder {
       opacity: 0;
     }
+
+    .block-code{width: 100% !important;}
 }

@@ -4,7 +4,6 @@ const chatId = window.location.pathname.split('/').pop(); // Получаем ch
 const inputMessage = document.getElementById('inputMessage');
 const displayMessage = document.getElementById('displayMessage');
 
-// Уникальный ID пользователя (можно генерировать на клиенте или получать с сервера)
 const senderId = Math.random().toString(36).substr(2, 9); // Генерация уникального идентификатора
 
 // Функция для замены новых строк на <br> теги
@@ -15,9 +14,16 @@ function formatMessage(message) {
 // Соединяемся с соответствующей комнатой
 socket.emit('join_chat', { chat_id: chatId });
 
+function formatMessage(message) {
+    // Заменяем текст с обратными кавычками на блоки с кодом
+    const codePattern = /`([^`]+)`/g;
+    message = message.replace(codePattern, '<div class="block-code"><code>$1</code></div>'); // Класс для подсветки
+    return message.replace(/\n/g, '<br>');
+}
+
 // Отправляем сообщение при каждом изменении ввода
 inputMessage.addEventListener('input', () => {
-    const messageText = inputMessage.value.trim() || 'Ожидание...';
+    const messageText = inputMessage.value.trim() || '...';
     socket.emit('update_message', { chat_id: chatId, text: messageText, sender_id: senderId });
 });
 
