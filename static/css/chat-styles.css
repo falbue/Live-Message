@@ -66,7 +66,7 @@ body {
 
 .friend {
     font-size: 24px;
-    color: var(--text-color);
+    color: var(--adptive-text);
     padding: 20px;
     flex-grow: 1;
     word-wrap: break-word; /* Обеспечивает перенос длинных слов */
@@ -109,10 +109,10 @@ svg{
 }
 
 path{
-    fill: var(--text-color);
+    fill: var(--adptive-text);
 /*    stroke-width: 0.3px;*/
-    stroke: var(--text-color);
-    color: var(--text-color);
+    stroke: var(--adptive-text);
+    color: var(--adptive-text);
 }
 
 

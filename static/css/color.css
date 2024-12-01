@@ -1,12 +1,6 @@
 :root {
-  --border-radius: 12px;
-  --bg-second-color: #4C3A7D; /* второй фон для тёмной темы */
-  --text-color: #E8D7FF; /* светлый текст для тёмной темы */
-  --text-disabled-color: #A28CBA; /* тусклый текст для неактивных элементов */
   --button: #9B4DFF; /* яркая кнопка */
-  --bg-menu: #5A3D8D; /* меню */
-  --bg-input: #5F3B8A; /* меню */
-  --text-button: #E8D7FF;
+  --adptive-text: #E8D7FF;
 }
 
 
