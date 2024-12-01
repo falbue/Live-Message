@@ -3,9 +3,10 @@
 {% block title %}Чат{% endblock %}
 
 {% block content %}
+{% include "menu.html" %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chat-styles.css') }}">
 <div class="block-icon">
-    <a class="icon button"><EnterSvg name='settings'></EnterSvg></a>
+    <a class="icon button" open-menu='settings'><EnterSvg name='settings'></EnterSvg></a>
     <a id="shareButton" class="icon button"><EnterSvg name='share'></EnterSvg></a>
     <a class="icon button"><EnterSvg name='close'></EnterSvg></a>
 </div>
