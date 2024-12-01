@@ -11,7 +11,7 @@
 </div>
 <main class="chat">
     <div class="friend-block">
-        <div id="displayMessage" class="friend"><b>Ожидание пользователя...</b></div>
+        <div id="displayMessage" class="friend"><b></b></div>
     </div>
     <div class="message-block">
         <textarea id="inputMessage" class="message" placeholder="Введите сообщение..." inputmode="text"></textarea>
@@ -20,6 +20,26 @@
 
 <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/share.js') }}"></script>
+<script type="text/javascript">
+    function typeText(elementId, text) {
+        const element = document.querySelector(`#${elementId} b`);
+        let i = 0;
 
+        const interval = setInterval(() => {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+            } else {
+                clearInterval(interval);
+            }
+    }, 100); // Задержка между символами
+    }
+
+// Пример вызова
+    document.addEventListener("DOMContentLoaded", () => {
+        typeText("displayMessage", "Ожидание пользователя...");
+    });
+
+</script>
 
 {% endblock %}
