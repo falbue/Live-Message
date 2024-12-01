@@ -10,11 +10,20 @@
         <div id="displayMessage" class="friend">Ожидание...</div>
     </div>
     <div class="message-block">
-        <textarea id="inputMessage" class="message" placeholder="Введите сообщение..."></textarea>
+        <textarea id="inputMessage" class="message" placeholder="Введите сообщение..." inputmode="text"></textarea>
     </div>
 </main>
 
 <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/share.js') }}"></script>
+<script>
+window.addEventListener('resize', function () {
+    if (window.innerHeight < 500) { // Определяем "клавиатурный" режим
+        document.querySelector('.chat').style.height = 'calc(100vh - 100px)';
+    } else {
+        document.querySelector('.chat').style.height = '100vh';
+    }
+});
 
+</script>
 {% endblock %}
