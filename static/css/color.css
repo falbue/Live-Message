@@ -1,22 +1,23 @@
 :root {
   --button: #9B4DFF; /* яркая кнопка */
   --adptive-text: #E8D7FF;
+  --bg-adaptive: #5F3B8A;
+  --black: #1A1A1A;
+  --white: #E8D7FF;
 }
 
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-color: #1A1A1A;
-    --bg-adaptive: #5F3B8A;
-    --text-color: #E8D7FF;
+    --bg-color: var(--black);
+    --text-color: var(--white);
   }
 }
 
 /* Стили для светлой темы */
 @media (prefers-color-scheme: light) {
   :root {
-    --text-color: #1A1A1A;
-    --bg-color: #E8D7FF;
-    --bg-adaptive: #5F3B8A;
+    --text-color: var(--black);
+    --bg-color: var(--white);
   }
 }
