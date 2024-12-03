@@ -12,7 +12,7 @@ document.getElementById('shareButton').addEventListener('click', function() {
       url: window.location.href
     })
     .then(() => {
-      notification.textContent = 'Ссылка успешно поделена';
+      notification.textContent = 'Ссылка скопирована в буфер обмена!';
       document.body.appendChild(notification);
       setTimeout(() => {
         notification.remove();
