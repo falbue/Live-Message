@@ -9,6 +9,7 @@
     <!-- <a class="icon button" open-menu='settings'><EnterSvg name='settings'></EnterSvg></a> -->
     <a id="shareButton" class="icon button"><EnterSvg name='share'></EnterSvg></a>
     <!-- <a class="icon button"><EnterSvg name='close'></EnterSvg></a> -->
+<div id="viewport-info">Height: </div>
 </div>
 <main class="chat">
     <div class="friend-block">
@@ -19,6 +20,8 @@
     </div>
 </main>
 
+
+<script src="{{ url_for('static', filename='scripts/block-resize-keyboard.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/share.js') }}"></script>
 <script type="text/javascript">
