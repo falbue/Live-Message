@@ -1,31 +1,46 @@
 document.addEventListener('touchmove', function(event) {
-        event.preventDefault();
-    }, { passive: false });
+    event.preventDefault();
+}, { passive: false });
 
+const viewportInfo = document.getElementById('viewport-info');
 
-    const viewportInfo = document.getElementById('viewport-info');
+let previousHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+let scrollBlocked = false;
 
-    function updateViewportInfo() {
-            // Получаем текущие значения для высоты viewport и body
-        const visualHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-        const bodyHeight = document.body.offsetHeight;
+function updateViewportInfo() {
+    // Получаем текущие значения для высоты viewport и body
+    const visualHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const bodyHeight = document.body.offsetHeight;
 
-            // Обновляем текст в левом верхнем углу
-        viewportInfo.textContent = `Viewport Height: ${visualHeight}px, Body Height: ${bodyHeight}px`;
+    // Обновляем текст в левом верхнем углу
+    viewportInfo.textContent = `Viewport Height: ${visualHeight}px, Body Height: ${bodyHeight}px`;
 
-            // Синхронизируем высоту body с высотой viewport
-        document.body.style.height = `${visualHeight}px`;
-
+    // Сравниваем текущую высоту с предыдущей
+    if (visualHeight < previousHeight && !scrollBlocked) {
+        // Если высота уменьшилась, запрещаем скролл
+        document.body.style.overflow = 'hidden';
+        scrollBlocked = true;
+    } else if (visualHeight >= previousHeight && scrollBlocked) {
+        // Если высота увеличилась, разрешаем скролл
+        document.body.style.overflow = '';
+        scrollBlocked = false;
     }
 
-    if (window.visualViewport) {
-            // Слушаем изменения visualViewport
-        window.visualViewport.addEventListener('resize', updateViewportInfo);
-        window.visualViewport.addEventListener('scroll', updateViewportInfo);
-    } else {
-            // Фолбэк для старых браузеров
-        window.addEventListener('resize', updateViewportInfo);
-    }
+    // Синхронизируем высоту body с высотой viewport
+    document.body.style.height = `${visualHeight}px`;
 
-        // Инициализация
-    updateViewportInfo();
+    // Обновляем значение предыдущей высоты
+    previousHeight = visualHeight;
+}
+
+if (window.visualViewport) {
+    // Слушаем изменения visualViewport
+    window.visualViewport.addEventListener('resize', updateViewportInfo);
+    window.visualViewport.addEventListener('scroll', updateViewportInfo);
+} else {
+    // Фолбэк для старых браузеров
+    window.addEventListener('resize', updateViewportInfo);
+}
+
+// Инициализация
+updateViewportInfo();

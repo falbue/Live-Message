@@ -38,7 +38,6 @@
 html, body {
     height: 100%;
     margin: 0;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -54,7 +53,6 @@ body {
 }
 
 .chat {
-    overflow: hidden;
     width: 100%; 
     height: 100%;
     transition: height 0.2s ease;
@@ -66,12 +64,14 @@ body {
     background-color: var(--bg-adaptive);
     border-radius: 0 0 12px 12px;
     box-shadow: 0px 6px 4px 0px rgba(0, 0, 0, 0.25);
+    overflow: auto;
 }
 
 .message-block {
     width: 100%;
     height: 10vh;
     position: absolute;
+    max-height: 10vh;
 }
 
 .friend {
