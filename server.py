@@ -1,9 +1,20 @@
 import uuid
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, Blueprint
 from flask_socketio import SocketIO, join_room, leave_room
 
-app = Flask(__name__)
-socketio = SocketIO(app)
+if __name__ == '__main__':
+    app = Flask(__name__)
+    socketio = SocketIO(app)
+else:
+    LiveMessage_bp = Blueprint(
+        'live_message',
+        __name__,
+        template_folder='templates',
+        static_folder='static',
+        static_url_path='/static'
+        )
+    socketio = SocketIO()
+
 
 @app.route('/')
 def index():
@@ -38,4 +49,4 @@ def on_leave(data):
     print(f'Client left chat {chat_id}')
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=80, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
