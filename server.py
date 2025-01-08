@@ -1,3 +1,5 @@
+PROJECT_NAME = "live-message"
+
 import uuid
 from flask import Flask, render_template, redirect, url_for, Blueprint
 from flask_socketio import SocketIO, join_room, leave_room
@@ -6,15 +8,20 @@ if __name__ == '__main__':
     app = Flask(__name__)
     socketio = SocketIO(app)
 else:
-    LiveMessage_bp = Blueprint(
-        'live_message',
-        __name__,
-        template_folder='templates',
-        static_folder='static',
-        static_url_path='/static'
-        )
     socketio = SocketIO()
 
+LiveMessage_bp = Blueprint(
+    PROJECT_NAME,
+    __name__,
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/static'
+    )
+app.register_blueprint(LiveMessage_bp, url_prefix=f'/{PROJECT_NAME}')
+
+@app.context_processor
+def inject_project_name():
+    return {'PROJECT_NAME': PROJECT_NAME}
 
 @app.route('/')
 def index():
