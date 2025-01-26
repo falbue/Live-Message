@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const svgName = element.getAttribute('name');
         if (svgName) {
-            fetch(`/static/icons/${svgName}.svg`)
+            fetch(`/live_message/live_message_static/icons/${svgName}.svg`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('SVG file not found');
