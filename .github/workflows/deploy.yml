@@ -8,6 +8,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
       - name: Execute deploy script via SSH
         uses: appleboy/ssh-action@master
         with:
@@ -15,3 +20,6 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: ${{ secrets.DEPLOY_SCRIPT_PATH }}
+          # Дополнительные опции для отладки
+          debug: true
+          timeout: 30s
