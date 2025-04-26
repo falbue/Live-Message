@@ -19,15 +19,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-      #!/bin/bash
-      cd Live-Message
-      git pull origin main
-      docker-compose down
-      docker-compose build --no-cache
-      docker-compose up -d
-
+          script: ${{ secrets.DEPLOY_SCRIPT_PATH }}
           # Дополнительные опции для отладки
           debug: true
           timeout: 30s
- 
