@@ -1,20 +1,12 @@
-# Используем официальный образ Python
-FROM python:3.9-slim
+FROM python:3.9
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем зависимости
 COPY requirements.txt .
-
-# Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем остальные файлы
 COPY . .
 
-# Порт, который будет использоваться
-EXPOSE 8000
+EXPOSE 80
 
-# Запускаем Gunicorn
-CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "-b", ":8000", "app:create_app()"]
+CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "-b", "0.0.0.0:80", "app:app"] 
