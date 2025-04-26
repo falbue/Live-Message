@@ -8,19 +8,10 @@ PROJECT_NAME = "live_message"
 
 Blueprint = Blueprint(
     PROJECT_NAME,
-    __name__,
-    template_folder='templates',
-    static_folder='static',
-    static_url_path=f'/{PROJECT_NAME}_static'
+    __name__
 )
 
-# Создаем экземпляр SocketIO
 socketio = SocketIO()
-
-# Регистрируем маршруты и обработчики событий в Blueprint
-@Blueprint.context_processor
-def inject_project_name():
-    return {'PROJECT_NAME': PROJECT_NAME}
 
 @Blueprint.route('/')
 def index():
@@ -44,7 +35,6 @@ def handle_message(data):
     chat_id = data['chat_id']
     text = data['text']
     sender_id = data['sender_id']
-    # Отправляем сообщение только в комнату chat_id
     socketio.emit('receive_message', {'text': text, 'sender_id': sender_id}, room=chat_id)
 
 @socketio.on('leave_chat')
@@ -58,4 +48,4 @@ if __name__ == '__main__':
     app = Flask(__name__)
     app.register_blueprint(Blueprint)
     socketio.init_app(app)
-    socketio.run(app, host='0.0.0.0', port=80, debug=True)
+    socketio.run(app, host='0.0.0.0', port=80, debug=False)
