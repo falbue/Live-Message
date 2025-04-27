@@ -8,20 +8,22 @@
 }
 
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
     --bg-color: var(--black);
-    --text-color: var(--white);
-    --button: #AF99CC;
-    --backgrond: #CDBCE2;
+    --text-color: var(--black);
+    --button: var(--ligth2);
+    --backgrond: var(--ligth);
+    --input: var(--white);
   }
 }
 
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   :root {
-    --text-color: var(--black);
+    --text-color: var(--white);
     --bg-color: var(--white);
-    --button: #2E2661;
-    --backgrond: #1A1A36;
+    --button: var(--dark2);
+    --backgrond: var(--dark);
+    --input: var(--black);
   }
 }

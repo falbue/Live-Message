@@ -43,3 +43,4 @@ function typeText(elementId, text) {
 document.addEventListener("DOMContentLoaded", () => {
     typeText("displayMessage", "Ожидание пользователя...");
 });
+
