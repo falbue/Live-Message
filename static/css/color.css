@@ -1,7 +1,8 @@
 :root {
-  --button: #9B4DFF; /* яркая кнопка */
-  --adptive-text: #E8D7FF;
-  --bg-adaptive: #5F3B8A;
+  --ligth: #CDBCE2;
+  --ligth2: #AF99CC;
+  --dark: #1A1A36;
+  --dark2: #2E2661;
   --black: #1A1A1A;
   --white: #E8D7FF;
 }
@@ -11,13 +12,16 @@
   :root {
     --bg-color: var(--black);
     --text-color: var(--white);
+    --button: #AF99CC;
+    --backgrond: #CDBCE2;
   }
 }
 
-/* Стили для светлой темы */
 @media (prefers-color-scheme: light) {
   :root {
     --text-color: var(--black);
     --bg-color: var(--white);
+    --button: #2E2661;
+    --backgrond: #1A1A36;
   }
 }
