@@ -12,9 +12,6 @@ function updateViewportInfo() {
     const visualHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
     const bodyHeight = document.body.offsetHeight;
 
-    // Обновляем текст в левом верхнем углу
-    viewportInfo.textContent = `Viewport Height: ${visualHeight}px, Body Height: ${bodyHeight}px`;
-
     // Сравниваем текущую высоту с предыдущей
     if (visualHeight < previousHeight && !scrollBlocked) {
         // Если высота уменьшилась, запрещаем скролл

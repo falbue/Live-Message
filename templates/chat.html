@@ -3,12 +3,11 @@
 {% block title %}Live!{% endblock %}
 
 {% block content %}
-{% include "menu.html" %}
+
 <link rel="stylesheet" type="text/css" href="{{ url_for('.static', filename='css/chat-styles.css') }}">
 <div class="block-icon">
     <a id="shareButton" class="icon button"><i class="iconoir iconoir-share-android"></i></a>
 
-<div id="viewport-info">Height: </div>
 </div>
 <main class="chat">
     <div class="friend-block">
@@ -23,26 +22,5 @@
 <script src="{{ url_for('.static', filename='scripts/block-resize-keyboard.js') }}"></script>
 <script src="{{ url_for('.static', filename='scripts/chat.js') }}"></script>
 <script src="{{ url_for('.static', filename='scripts/share.js') }}"></script>
-<script type="text/javascript">
-    function typeText(elementId, text) {
-        const element = document.querySelector(`#${elementId} b`);
-        let i = 0;
-
-        const interval = setInterval(() => {
-            if (i < text.length) {
-                element.textContent += text.charAt(i);
-                i++;
-            } else {
-                clearInterval(interval);
-            }
-    }, 100); // Задержка между символами
-    }
-
-// Пример вызова
-    document.addEventListener("DOMContentLoaded", () => {
-        typeText("displayMessage", "Ожидание пользователя...");
-    });
-
-</script>
 
 {% endblock %}

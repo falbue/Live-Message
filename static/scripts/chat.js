@@ -1,28 +1,45 @@
 const socket = io();
-const chatId = window.location.pathname.split('/').pop(); // Получаем chat_id из URL
+const chatId = window.location.pathname.split('/').pop();
 const inputMessage = document.getElementById('inputMessage');
 const displayMessage = document.getElementById('displayMessage');
-const senderId = Math.random().toString(36).substr(2, 9); // Генерация уникального идентификатора
+const senderId = Math.random().toString(36).substr(2, 9);
 
 function formatMessage(message) {
-    // Заменяем текст, заключённый в обратные кавычки на блоки с кодом
-    const codePattern = /`([^`]+)`/g; // Захватываем текст, заключённый в обратные кавычки
-    message = message.replace(codePattern, '<div class="block-code"><code>$1</code></div>'); // Класс для подсветки
-    return message.replace(/\n/g, '<br>'); // Заменяем переносы строк
+    const codePattern = /`([^`]+)`/g;
+    message = message.replace(codePattern, '<div class="block-code"><code>$1</code></div>');
+    return message.replace(/\n/g, '<br>');
 }
-// Соединяемся с соответствующей комнатой и отправляем сообщение о подключении
+
+// Подключаемся к чату
 socket.emit('join_chat', { chat_id: chatId, sender_id: senderId });
 
-// Отправляем сообщение при каждом изменении ввода
+// Отправка сообщений при изменении ввода
 inputMessage.addEventListener('input', () => {
     const messageText = inputMessage.value.trim() || '...';
     socket.emit('update_message', { chat_id: chatId, text: messageText, sender_id: senderId });
 });
 
-// Обновляем текстовое сообщение при получении данных
+// Получение сообщений
 socket.on('receive_message', (data) => {
-    // Не заменяем сообщение, если оно было отправлено тем же пользователем
     if (data.sender_id !== senderId) {
-        displayMessage.innerHTML = formatMessage(data.text); // Используем innerHTML для поддержания <br>
+        displayMessage.innerHTML = formatMessage(data.text);
     }
+});
+
+function typeText(elementId, text) {
+    const element = document.querySelector(`#${elementId} b`);
+    let i = 0;
+
+    const interval = setInterval(() => {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+        } else {
+            clearInterval(interval);
+        }
+    }, 100); // Задержка между символами
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    typeText("displayMessage", "Ожидание пользователя...");
 });

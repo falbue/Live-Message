@@ -1,6 +1,6 @@
 import uuid
 from flask import Flask, render_template
-from flask_socketio import SocketIO, join_room, leave_room
+from flask_socketio import SocketIO, join_room, leave_room, disconnect
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -28,8 +28,4 @@ def handle_message(data):
                  {'text': data['text'], 'sender_id': data['sender_id']}, 
                  room=data['chat_id'])
 
-@socketio.on('leave_chat')
-def on_leave(data):
-    leave_room(data['chat_id'])
-
-# Убираем socketio.run() - приложение будет запускаться через Gunicorn
+socketio.run(app, host="0.0.0.0", port=80, allow_unsafe_werkzeug=True, debug=True)
