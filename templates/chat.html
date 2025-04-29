@@ -14,7 +14,8 @@
         <div id="displayMessage" class="friend"><b></b></div>
     </div>
     <div class="message-block">
-        <textarea id="inputMessage" class="message" placeholder="Введите сообщение..." inputmode="text"></textarea>
+        <div class="resizer" id="dragMe"></div>
+        <textarea id="inputMessage" class="message message-block" placeholder="Введите сообщение..." inputmode="text"></textarea>
     </div>
 </main>
 
@@ -22,5 +23,31 @@
 <script src="{{ url_for('.static', filename='scripts/block-resize-keyboard.js') }}"></script>
 <script src="{{ url_for('.static', filename='scripts/chat.js') }}"></script>
 <script src="{{ url_for('.static', filename='scripts/share.js') }}"></script>
+
+<script>
+    const resizer = document.getElementById('dragMe');
+    const topBlock = document.querySelector('.friend-block');
+    const bottomBlock = document.querySelector('.message');
+    let startY, startTopHeight, startBottomHeight;
+
+    resizer.addEventListener('mousedown', function(e) {
+        startY = e.clientY;
+        startTopHeight = parseInt(document.defaultView.getComputedStyle(topBlock).height, 10);
+        startBottomHeight = parseInt(document.defaultView.getComputedStyle(bottomBlock).height, 10);
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+    });
+
+    function mouseMoveHandler(e) {
+        const dy = e.clientY - startY;
+        topBlock.style.height = (startTopHeight + dy) + 'px';
+        bottomBlock.style.height = (startBottomHeight - dy) + 'px';
+    }
+
+    function mouseUpHandler() {
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+    }
+</script>
 
 {% endblock %}
