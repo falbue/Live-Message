@@ -4,12 +4,12 @@
 
 {% block content %}
 
-<main class='display main-index'>
-	<div class="container index">
-		<div>
+<main class='display center'>
+	<div class="container">
+		<div class="hello">
 			<h1>Live Message</h1>
 			<h2>общение в реальном времени!</h2>
-			<a href="{{ url_for('.chat', chat_id=chat_id) }}" class="button">Перейти</a>
+			<a href="{{ url_for('.chat', chat_id=chat_id) }}" class="button"><h3>Перейти</h3></a>
 		</div>
 	</div>
 </main>
