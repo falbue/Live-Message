@@ -28,4 +28,5 @@ def handle_message(data):
                  {'text': data['text'], 'sender_id': data['sender_id']}, 
                  room=data['chat_id'])
 
-# socketio.run(app, host="0.0.0.0", port=80, allow_unsafe_werkzeug=True, debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, host="0.0.0.0", port=5001)

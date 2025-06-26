@@ -1,25 +1,45 @@
-name: Deploy to Server
+name: Запуск на сервере
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Add server to known_hosts
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Настройка SSH
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
-      - name: Execute deploy script via SSH
-        uses: appleboy/ssh-action@master
+          
+      - name: Очистка старого .env
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: ${{ secrets.DEPLOY_SCRIPT_PATH }}
-          # Дополнительные опции для отладки
-          debug: true
-          timeout: 30s
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            rm -rf /tmp/.env  # Удаляем, если это директория
+
+      - name: отправка .prod.env
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: ".prod.env"
+          target: "/tmp/.env"
+      
+      
+      - name: Деполой
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            chmod +x ~/deploy.sh
+            ~/deploy.sh ${{ github.repository_owner }} ${{ github.event.repository.name }}
