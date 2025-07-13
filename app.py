@@ -1,5 +1,5 @@
 import uuid
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from flask_socketio import SocketIO, join_room, leave_room, disconnect
 
 app = Flask(__name__)
@@ -9,6 +9,15 @@ socketio = SocketIO(app, async_mode='eventlet')
 def index():
     chat_id = uuid.uuid4().hex
     return render_template('index.html', chat_id=chat_id)
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(
+        directory='static/icons',
+        path='favicon.svg',
+        mimetype='image/svg+xml'
+    )
+
 
 @app.route('/chat/<chat_id>')
 def chat(chat_id):
