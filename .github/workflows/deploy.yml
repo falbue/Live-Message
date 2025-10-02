@@ -5,6 +5,7 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
+    # inputs больше не нужны - используем встроенный выбор branch/tag
 
 jobs:
   deploy:
@@ -14,41 +15,43 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.ref }} # Используем выбранную ссылку (branch или tag)
 
-      - name: Проверка формата тега (для автоматического запуска)
-        if: github.event_name == 'push'
-        id: check-tag
+      - name: Определение версии
+        id: get-version
         run: |
-          TAG_NAME=${GITHUB_REF#refs/tags/v}
-          TAG_NAME=${TAG_NAME#refs/tags/}
-          
-          if [[ $TAG_NAME =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "VALID_TAG=true" >> $GITHUB_OUTPUT
+          # Определяем, что было выбрано: branch или tag
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            # Это тег
+            VERSION=${GITHUB_REF#refs/tags/}
+            VERSION_TYPE="tag"
           else
-            echo "Версия $TAG_NAME НЕ соответствует формату x.x.x - деплой отменен"
-            echo "VALID_TAG=false" >> $GITHUB_OUTPUT
+            # Это ветка
+            VERSION=${GITHUB_REF#refs/heads/}
+            VERSION_TYPE="branch"
           fi
-
+          
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION_TYPE=$VERSION_TYPE" >> $GITHUB_OUTPUT
+          echo "VALID=true" >> $GITHUB_OUTPUT
       - name: Настройка SSH
-        if: github.event_name == 'workflow_dispatch' || steps.check-tag.outputs.VALID_TAG == 'true'
+        if: steps.get-version.outputs.VALID == 'true'
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
       - name: Очистка старого .env
-        if: github.event_name == 'workflow_dispatch' || steps.check-tag.outputs.VALID_TAG == 'true'
+        if: steps.get-version.outputs.VALID == 'true'
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            rm -rf /tmp/.env  # Удаляем, если это директория
-
+            rm -rf /tmp/.env
       - name: Отправка .production
-        if: github.event_name == 'workflow_dispatch' || steps.check-tag.outputs.VALID_TAG == 'true'
+        if: steps.get-version.outputs.VALID == 'true'
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -58,7 +61,7 @@ jobs:
           target: "/tmp/.env"
 
       - name: Деплой
-        if: github.event_name == 'workflow_dispatch' || steps.check-tag.outputs.VALID_TAG == 'true'
+        if: steps.get-version.outputs.VALID == 'true'
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -66,4 +69,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             chmod +x ~/deploy.sh
-            ~/deploy.sh ${{ github.repository_owner }} ${{ github.event.repository.name }}
+            ~/deploy.sh ${{ github.repository_owner }} ${{ github.event.repository.name }} ${{ steps.get-version.outputs.VERSION_TYPE }} ${{ steps.get-version.outputs.VERSION }}
