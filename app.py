@@ -47,7 +47,7 @@ def handle_call_response(data):
     else:
         socketio.emit('call:rejected', data, room=chat_id, skip_sid=request.sid)
 
-@socketio.on('call:end')
+@socketio.on('call:ended')
 def handle_call_end(data):
     """Обработка завершения звонка"""
     chat_id = data['chatId']
@@ -70,4 +70,4 @@ def handle_ice_candidate(data):
     socketio.emit('webrtc:ice-candidate', data, room=chat_id, skip_sid=request.sid)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5001, debug=True)
+    socketio.run(app, host='0.0.0.0', port=80, debug=True)

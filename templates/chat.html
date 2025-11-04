@@ -3,17 +3,8 @@
 {% block title %}Live Message{% endblock %}
 
 {% block content %}
+<div id="notification" class="notification"></div>
 <main>
-    <div id="incomingCall" class="hidden">
-        <div class="call-notification">
-            <p>Входящий <span id="callType">видео</span> вызов</p>
-            <div class="call-actions">
-                <button id="acceptCall" class="call-btn accept"><i class="iconoir-check"></i></button>
-                <button id="declineCall" class="call-btn decline"><i class="iconoir-close"></i></button>
-            </div>
-        </div>
-    </div>
-
     <div class="chat">
         <p id="displayMessage"><b></b></p>
     </div>
@@ -27,6 +18,8 @@
         </div>
         
         <div class="buttons">
+            <button id="acceptCall" class="call-btn accept hidden"><i class="iconoir-phone"></i></button>
+            <button id="declineCall" class="call-btn decline hidden"><i class="iconoir-phone-disabled"></i></button>
             <button id="endCall" class="call-btn end hidden"><i class="iconoir-phone-disabled"></i></button>
             <button id="audioCallButton"><i class="iconoir-phone"></i></button>
             <button id="videoCallButton"><i class="iconoir-camera"></i></button>
@@ -38,4 +31,5 @@
 <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/calls.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/share.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/notification.js') }}" defer></script>
 {% endblock %}

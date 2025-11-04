@@ -135,8 +135,9 @@ async function acceptCall() {
         declineCall();
         return;
     }
-
-    incomingCall.classList.add('hidden');
+    
+    acceptCallBtn.classList.add('hidden');
+    declineCallBtn.classList.add('hidden');
     callControls.classList.remove('hidden');
 
     initPeerConnection(false);
@@ -172,7 +173,8 @@ async function acceptCall() {
 // Отклонение звонка
 function declineCall() {
     clearTimeout(callTimeout);
-    incomingCall.classList.add('hidden');
+    acceptCallBtn.classList.add('hidden');
+    declineCallBtn.classList.add('hidden');
     toggleCallButtons(true);
 
     socket.emit('call:response', {
@@ -206,7 +208,9 @@ function endCall() {
     remoteVideo.srcObject = null;
     videoContainer.classList.add('hidden');
     callControls.classList.add('hidden');
-    incomingCall.classList.add('hidden');
+
+    acceptCallBtn.classList.add('hidden');
+    declineCallBtn.classList.add('hidden');
     toggleCallButtons(true);
 
     clearTimeout(callTimeout);
@@ -215,7 +219,7 @@ function endCall() {
     isCaller = false;
 
     if (callId) {
-        socket.emit('call:end', {
+        socket.emit('call:ended', {
             chatId,
             senderId,
             callId
@@ -276,8 +280,10 @@ socket.on('call:incoming', data => {
     callId = data.callId;
     pendingOffer = data.sdp; // сохраняем offer (объект {type, sdp})
 
-    callTypeDisplay.textContent = data.type === 'video' ? 'видео' : 'аудио';
-    incomingCall.classList.remove('hidden');
+    // callTypeDisplay.textContent = data.type === 'video' ? 'видео' : 'аудио';
+    acceptCallBtn.classList.remove('hidden');
+    declineCallBtn.classList.remove('hidden');
+    notification("Поступил звонок");
     toggleCallButtons(false);
 
     callTimeout = setTimeout(() => {
@@ -289,7 +295,8 @@ socket.on('call:accepted', async data => {
     if (data.callId !== callId) return;
 
     clearTimeout(callTimeout);
-    incomingCall.classList.add('hidden');
+    acceptCallBtn.classList.add('hidden');
+    declineCallBtn.classList.add('hidden');
 
     try {
         await peerConnection.setRemoteDescription(data.sdp);
@@ -303,14 +310,17 @@ socket.on('call:rejected', data => {
     if (data.callId !== callId) return;
 
     clearTimeout(callTimeout);
-    alert('Звонок отклонён');
+    notification('Звонок отклонён');
     endCall();
 });
 
 socket.on('call:ended', data => {
-    if (data.callId === callId) {
-        endCall();
-    }
+    console.log("раб1")
+    if (data.callId !== callId) return;
+    console.log("раб2")
+    clearTimeout(callTimeout);
+    notification('Звонок отклонён');
+    endCall();
 });
 
 socket.on('webrtc:ice-candidate', async data => {
