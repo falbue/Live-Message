@@ -65,15 +65,17 @@ button,
 button>i,
 .button>i{font-size: 1.2rem}
 
-.sup-buttons {
+nav {
 	position: fixed;
-	inset: auto 10px 100px auto;
+	inset: auto auto 100px auto;
 	will-change: transform;
 	z-index: 100;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	width: 96%;
 	gap: 4px;
+	margin-right: auto;
 }
 
 .notification {
@@ -159,7 +161,7 @@ code {
 .block-code {
 	background-color: black;
 	border-radius: 12px;
-	width: 90%;
+	width: 100%;
 	padding: 2px 6px;
 	box-sizing: border-box;
 }
@@ -230,9 +232,6 @@ code {
 }
 
 #videoContainer {
-    position: fixed;
-    top: 10px;
-    right: 10px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -250,13 +249,9 @@ code {
     transition: all 0.3s ease;
 }
 
-#localVideo.mini, #remoteVideo.mini {
-    position: fixed;
-    top: 10px;
-    right: 10px;
+video{
     width: 160px;
     height: 90px;
-    z-index: 1100;
 }
 
 #localVideo.fullscreen, #remoteVideo.fullscreen {
