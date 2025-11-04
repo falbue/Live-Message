@@ -1,21 +1,42 @@
 {% extends "base.html" %}
 
-{% block title %}Live!{% endblock %}
+{% block title %}Live Message{% endblock %}
 
 {% block content %}
-
-<button id="shareButton"><i class="iconoir-share-android"></i></button>
 <main>
     <div class="chat">
         <p id="displayMessage"><b></b></p>
+        
+        <!-- Элементы для звонков -->
+        <div id="incomingCall" class="hidden">
+            <div class="call-notification">
+                <p>Входящий <span id="callType">видео</span> вызов</p>
+                <div class="call-actions">
+                    <button id="acceptCall" class="call-btn accept"><i class="iconoir-check"></i></button>
+                    <button id="declineCall" class="call-btn decline"><i class="iconoir-close"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="videoContainer" class="hidden">
+            <video id="localVideo" autoplay muted playsinline></video>
+            <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+        
+        <div id="callControls" class="hidden">
+            <button id="endCall" class="call-btn end"><i class="iconoir-call-end"></i></button>
+        </div>
     </div>
+    
     <textarea id="inputMessage" placeholder="Введите сообщение..." inputmode="text"></textarea>
-</div>
+    <div class="sup-buttons">
+        <button id="audioCallButton"><i class="iconoir-microphone"></i></button>
+        <button id="videoCallButton"><i class="iconoir-camera"></i></button>
+        <button id="shareButton"><i class="iconoir-share-android"></i></button>
+    </div>
 </main>
 
-
-<script src="{{ url_for('.static', filename='scripts/block-resize-keyboard.js') }}"></script>
-<script src="{{ url_for('.static', filename='scripts/chat.js') }}"></script>
-<script src="{{ url_for('.static', filename='scripts/share.js') }}"></script>
-
+<script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/calls.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/share.js') }}"></script>
 {% endblock %}

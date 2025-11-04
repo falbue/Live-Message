@@ -1,4 +1,4 @@
-const socket = io();
+const socket = window.socket = io()
 const chatId = window.location.pathname.split('/').pop();
 const inputMessage = document.getElementById('inputMessage');
 const displayMessage = document.getElementById('displayMessage');
