@@ -42,3 +42,8 @@
     margin: 0;
     font-size: 0;
 }
+
+.show{
+  visibility: visible !important;
+  opacity: 1 !important;
+}
