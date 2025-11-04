@@ -65,14 +65,15 @@ button,
 button>i,
 .button>i{font-size: 1.2rem}
 
-#shareButton {
+.sup-buttons {
 	position: fixed;
-	inset: 10px 10px auto auto;
+	inset: auto 10px 100px auto;
 	will-change: transform;
 	z-index: 100;
-}
-@media (max-width: 768px) {
-	#shareButton{inset: auto 10px 100px auto;}
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 4px;
 }
 
 .notification {
