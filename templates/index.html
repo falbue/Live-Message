@@ -4,14 +4,16 @@
 
 {% block content %}
 
-<main class='display center'>
-	<div class="container">
-		<div class="hello">
-			<h1>Live Message</h1>
-			<h2>Общение в реальном времени!</h2>
-			<a href="{{ url_for('.chat', chat_id=chat_id) }}" class="button"><h3>Перейти</h3></a>
+<main>
+	<section class="center">
+		<div class="hero">
+			<div>
+				<h1>Live Message</h1>
+				<h2>Общение в реальном времени!</h2>
+			</div>
+			<a href="{{ url_for('.chat', chat_id=chat_id) }}" class="button"><h3>Создать команту</h3></a>
 		</div>
-	</div>
+	</section>
 </main>
 
 {% endblock %}

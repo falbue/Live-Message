@@ -4,50 +4,18 @@
 
 {% block content %}
 
-<link rel="stylesheet" type="text/css" href="{{ url_for('.static', filename='css/chat-styles.css') }}">
-<div class="block-icon">
-    <a id="shareButton" class="icon button"><i class="iconoir iconoir-share-android"></i></a>
-
+<button id="shareButton"><i class="iconoir-share-android"></i></button>
+<main>
+    <div class="chat">
+        <p id="displayMessage"><b></b></p>
+    </div>
+    <textarea id="inputMessage" placeholder="Введите сообщение..." inputmode="text"></textarea>
 </div>
-<main class="chat">
-    <div class="friend-block">
-        <div id="displayMessage" class="friend"><b></b></div>
-    </div>
-    <div class="message-block">
-        <div class="resizer" id="dragMe"></div>
-        <textarea id="inputMessage" class="message message-block" placeholder="Введите сообщение..." inputmode="text"></textarea>
-    </div>
 </main>
 
 
 <script src="{{ url_for('.static', filename='scripts/block-resize-keyboard.js') }}"></script>
 <script src="{{ url_for('.static', filename='scripts/chat.js') }}"></script>
 <script src="{{ url_for('.static', filename='scripts/share.js') }}"></script>
-
-<script>
-    const resizer = document.getElementById('dragMe');
-    const topBlock = document.querySelector('.friend-block');
-    const bottomBlock = document.querySelector('.message');
-    let startY, startTopHeight, startBottomHeight;
-
-    resizer.addEventListener('mousedown', function(e) {
-        startY = e.clientY;
-        startTopHeight = parseInt(document.defaultView.getComputedStyle(topBlock).height, 10);
-        startBottomHeight = parseInt(document.defaultView.getComputedStyle(bottomBlock).height, 10);
-        document.addEventListener('mousemove', mouseMoveHandler);
-        document.addEventListener('mouseup', mouseUpHandler);
-    });
-
-    function mouseMoveHandler(e) {
-        const dy = e.clientY - startY;
-        topBlock.style.height = (startTopHeight + dy) + 'px';
-        bottomBlock.style.height = (startBottomHeight - dy) + 'px';
-    }
-
-    function mouseUpHandler() {
-        document.removeEventListener('mousemove', mouseMoveHandler);
-        document.removeEventListener('mouseup', mouseUpHandler);
-    }
-</script>
 
 {% endblock %}
