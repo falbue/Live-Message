@@ -1,0 +1,35 @@
+:root {
+  --ligth: #CDBCE2;
+  --ligth2: #AF99CC;
+  --dark: #1A1A36;
+  --dark2: #2E2661;
+  --black: #1A1A1A;
+  --white: #E8D7FF;
+}
+
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-color: var(--black);
+    --text-color: var(--black);
+    --button: var(--ligth2);
+    --backgrond: var(--ligth);
+    --input: var(--white);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-color: var(--white);
+    --bg-color: var(--white);
+    --button: var(--dark2);
+    --backgrond: var(--dark);
+    --input: var(--black);
+  }
+}
+
+.center{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

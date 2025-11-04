@@ -1,0 +1,170 @@
+@import url("animation.css");
+@import url("variables.css");
+
+
+*{
+	padding: 0;
+	margin: 0;
+	font-family: "Montserrat", sans-serif;
+	font-optical-sizing: auto;
+	font-style: normal;
+}
+
+
+html, body{
+	background-color: var(--backgrond);
+	height: 100%;
+}
+
+main{
+	height: 100%;
+	box-sizing: border-box;
+}
+
+a{text-decoration: none;}
+
+h1 {font-size: 4rem;}
+h2 {font-size: 2rem;}
+h3 {font-size: 1.5rem;}
+
+@media (max-width: 768px) {
+	h1 {font-size: clamp(2rem, 6vw, 3rem);}
+	h2 {font-size: clamp(1.125rem, 4vw, 1.125rem);}
+	h3 {font-size: clamp(1.125rem, 4.5vw, 1.25rem);}
+}
+
+h1, h2, h3, p {color: var(--text-color);}
+
+
+section{
+	display: flex;
+	flex-direction: column;
+	margin-left: auto;
+	margin-right: auto;
+	width: 90%;
+	min-height: 100%;
+}
+
+button,
+.button{
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	font-weight: bold;
+	text-align: center;
+	border-radius: 12px;
+	padding: 12px;
+	background-color: var(--button);
+	color: var(--text-color);
+	box-shadow: 0px 6px 4px 0px rgba(0, 0, 0, 0.25);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	border: none;
+}
+
+button>i,
+.button>i{font-size: 1.2rem}
+
+#shareButton {
+	position: fixed;
+	inset: 10px 10px auto auto;
+	will-change: transform;
+	z-index: 100;
+}
+@media (max-width: 768px) {
+	#shareButton{inset: auto 10px 100px auto;}
+}
+
+.notification {
+	position: fixed;
+	inset: 20px auto auto 50%;
+	transform: translateX(-50%);
+	background-color: var(--button);
+	color: var(--adptive-text);
+	padding: 10px 20px;
+	border-radius: 5px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	font-size: 16px;
+	z-index: 9999;
+	opacity: 0;
+	animation: fadeInOut 3s forwards;
+}
+
+@media (max-width: 768px) {
+	.notification {
+		inset: auto;
+		bottom: 20px;
+	}
+
+}
+
+.hero{
+	display: flex;
+	flex-direction: column;
+	margin-right: auto;
+	justify-content: space-between;
+	min-height: 400px;
+	padding: 20px 0;
+	box-sizing: border-box;
+}
+.hero::before {
+	content: '';
+	flex: 0 0 auto;
+	visibility: hidden
+}
+
+@media (max-width: 768px) {
+	.hero{
+		height: 95vh;
+		margin-right: 0;
+		width: 100%;
+		text-align: center;
+	}
+}
+
+textarea {
+	position: absolute;
+	background-color: var(--input);
+	color: var(--text-color);
+	font-size: 24px;
+	padding: 20px 20px 20px 20px;
+	width: 100%;
+	border: none;
+	resize: none;
+	box-sizing: border-box;
+	bottom: 0;
+	min-height: 5vh;
+}
+
+textarea:focus {outline: none;}
+
+@media (max-width: 768px){
+	textarea::placeholder {
+		position: absolute;
+		bottom: 20px;
+		font-size: 20px;
+	}
+	textarea {font-size: 20px}
+}
+
+
+code {
+	font-family: "Ubuntu Mono", monospace;
+	font-style: normal;
+	font-size: 14px;
+	color: white;
+}
+
+.block-code {
+	background-color: black;
+	border-radius: 12px;
+	width: 90%;
+	padding: 2px 6px;
+	box-sizing: border-box;
+}
+
+.chat{
+	padding: 12px;
+	font-size: 1.2rem;
+	c
+}
