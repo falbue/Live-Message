@@ -10,15 +10,6 @@ def index():
     chat_id = uuid.uuid4().hex
     return render_template('index.html', chat_id=chat_id)
 
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(
-        directory='static/icons',
-        path='favicon.svg',
-        mimetype='image/svg+xml'
-    )
-
-
 @app.route('/chat/<chat_id>')
 def chat(chat_id):
     return render_template('chat.html', chat_id=chat_id)
