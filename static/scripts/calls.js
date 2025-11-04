@@ -8,7 +8,7 @@ const endCallBtn = document.getElementById('endCall');
 const videoContainer = document.getElementById('videoContainer');
 const localVideo = document.getElementById('localVideo');
 const remoteVideo = document.getElementById('remoteVideo');
-const callControls = document.getElementById('callControls');
+const callControls = document.getElementById('endCall');
 
 // Состояния звонка
 let localStream = null;
@@ -18,7 +18,7 @@ let isCaller = false;
 let currentCallType = null;
 let callTimeout = null;
 let callId = null;
-let pendingOffer = null; // для входящих звонков
+let pendingOffer = null;
 
 // Конфигурация WebRTC
 const iceServers = {
@@ -257,10 +257,8 @@ function toggleFullscreen(videoElement) {
 
 // Управление кнопками звонков
 function toggleCallButtons(show) {
-    audioCallButton.disabled = !show;
-    videoCallButton.disabled = !show;
-    audioCallButton.style.opacity = show ? 1 : 0.5;
-    videoCallButton.style.opacity = show ? 1 : 0.5;
+    audioCallButton.classList.toggle('hidden', !show);
+    videoCallButton.classList.toggle('hidden', !show);
 }
 
 // Слушатели событий
