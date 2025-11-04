@@ -68,7 +68,7 @@ button>i,
 
 nav {
 	position: fixed;
-	inset: auto auto 100px auto;
+	inset: auto auto 110px auto;
 	will-change: transform;
 	z-index: 100;
 	display: flex;
@@ -79,6 +79,13 @@ nav {
 	box-sizing: border-box;
 	margin-right: auto;
 }
+
+@media (max-width: 768px) {
+	nav{
+		inset: auto auto 100px auto;
+	}
+}
+
 nav>.buttons{
 	display: flex;
 	align-items: center;
@@ -88,23 +95,25 @@ nav>.buttons{
 
 .notification {
 	position: fixed;
+	min-width: 250px;
 	inset: 20px auto auto 50%;
 	transform: translateX(-50%);
 	background-color: var(--button);
 	color: var(--adptive-text);
 	padding: 10px 20px;
-	border-radius: 5px;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-	font-size: 16px;
+	border-radius: 12px;
 	z-index: 9999;
 	opacity: 0;
-	animation: fadeInOut 3s forwards;
+	visibility: hidden;
+	transition: opacity 0.5s, visibility 0.5s;
+	font-size: 1.2rem;
+	text-align: center;
+	color: var(--text-color);
+	border: 1px solid var(--text-color);
 }
 
 @media (max-width: 768px) {
 	.notification {
-		inset: auto;
-		bottom: 20px;
 	}
 
 }
@@ -155,7 +164,7 @@ textarea:focus {outline: none;}
 		bottom: 20px;
 		font-size: 20px;
 	}
-	textarea {font-size: 20px}
+	textarea {font-size: 1.2rem}
 }
 
 
