@@ -108,7 +108,7 @@ async function startCall(type) {
         callTimeout = setTimeout(() => {
             if (isCaller) {
                 endCall();
-                alert('Звонок не был принят');
+                notification('Звонок не был принят');
             }
         }, 30000);
 
@@ -270,7 +270,7 @@ audioCallButton?.addEventListener('click', () => startCall('audio'));
 videoCallButton?.addEventListener('click', () => startCall('video'));
 acceptCallBtn?.addEventListener('click', acceptCall);
 declineCallBtn?.addEventListener('click', declineCall);
-endCallBtn?.addEventListener('click', endCall);
+endCallBtn?.addEventListener('click', declineCall);
 
 // Сокет-события
 socket.on('call:incoming', data => {
