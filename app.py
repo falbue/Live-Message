@@ -1,16 +1,13 @@
 import uuid
 from flask import Flask, render_template, send_from_directory, request, jsonify
 from flask_socketio import SocketIO, join_room, leave_room, disconnect
-import time
-import hmac
-import hashlib
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
-TURN_SECRET = os.getenv("TURN_SECRET")
-TURN_REALM = os.getenv("TURN_REALM")
+USERNAME = os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
 TURN_SERVER = os.getenv("TURN_SERVER")
 TURN_PORT = int(os.getenv("TURN_PORT"))
 
@@ -18,20 +15,9 @@ app = Flask(__name__)
 socketio = SocketIO(app, async_mode='eventlet')
 
 def generate_turn_credentials():
-    expiration_time = int(time.time()) + 3600
-    
-    # ВАЖНО: используй формат "timestamp:realm" для HMAC
-    username_for_hmac = f"{expiration_time}:{TURN_REALM}"
-    
-    password = hmac.new(
-        TURN_SECRET.encode(),
-        msg=username_for_hmac.encode(),
-        digestmod=hashlib.sha1
-    ).hexdigest()
-
     return {
-        "username": str(expiration_time),  # username для клиента
-        "password": password,
+        "username": "webrtc_user",
+        "password": "F9H_X*CdtWh3~m&47pcr|34fcab0a0601e3d3f7da65323663c37de3079fbf|b47fb507179e3b6a6254974797b866e3",
         "ttl": 3600
     }
 
