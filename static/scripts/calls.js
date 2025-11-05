@@ -76,7 +76,8 @@ function initPeerConnection(isInitiator) {
 
     peerConnection.onicecandidate = event => {
         if (event.candidate) {
-            console.log('ICE candidate:', event.candidate);
+            console.log('Sending ICE candidate:', event.candidate);
+            console.log('Socket connected:', socket.connected); // Проверяем соединение
             socket.emit('webrtc:ice-candidate', {
                 chatId,
                 senderId,
@@ -368,14 +369,33 @@ socket.on('call:ended', data => {
     endCall();
 });
 
+// ОБНОВЛЁННЫЙ обработчик ICE-кандидатов с логированием
 socket.on('webrtc:ice-candidate', async data => {
-    if (data.senderId === senderId || !peerConnection) return;
+    console.log('Call IDs - mine:', callId, 'received:', data.callId);
+    console.log('Receiving ICE candidate:', data.candidate);
+    console.log('Current connection state:', peerConnection?.connectionState);
+    
+    if (data.senderId === senderId || !peerConnection || data.callId !== callId) return;
 
     try {
         await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        console.log('ICE candidate added successfully');
     } catch (error) {
         console.error('Ошибка добавления ICE кандидата:', error);
     }
+});
+
+// Добавим обработчики состояния соединения Socket.IO
+socket.on('connect', () => {
+    console.log('Socket connected');
+});
+
+socket.on('disconnect', (reason) => {
+    console.log('Socket disconnected:', reason);
+});
+
+socket.on('connect_error', (error) => {
+    console.error('Socket connection error:', error);
 });
 
 document.addEventListener('fullscreenchange', () => {
