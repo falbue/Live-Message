@@ -18,20 +18,19 @@ app = Flask(__name__)
 socketio = SocketIO(app, async_mode='eventlet')
 
 def generate_turn_credentials():
-    # Время истечения креденциалов (в секундах)
-    expiration_time = int(time.time()) + 3600  # 1 час
+    expiration_time = int(time.time()) + 3600
     
-    # Генерируем пароль как HMAC(secret, username)
-    username = str(expiration_time)
+    # ВАЖНО: используй формат "timestamp:realm" для HMAC
+    username_for_hmac = f"{expiration_time}:{TURN_REALM}"
     
     password = hmac.new(
         TURN_SECRET.encode(),
-        msg=username.encode(),
+        msg=username_for_hmac.encode(),
         digestmod=hashlib.sha1
     ).hexdigest()
 
     return {
-        "username": username,
+        "username": str(expiration_time),  # username для клиента
         "password": password,
         "ttl": 3600
     }
