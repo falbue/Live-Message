@@ -5,9 +5,16 @@ const displayMessage = document.getElementById('displayMessage');
 const senderId = Math.random().toString(36).substr(2, 9);
 
 function formatMessage(message) {
-    const codePattern = /`([^`]+)`/g;
-    message = message.replace(codePattern, '<div class="block-code"><code>$1</code></div>');
-    return message.replace(/\n/g, '<br>');
+    const escapeHtml = (str) => {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    };
+    let escapedMessage = escapeHtml(message);
+
+    const codeBlockPattern = /```([\s\S]*?)```/g;
+    escapedMessage = escapedMessage.replace(codeBlockPattern, '<pre class="block-code" ><code>$1</code></pre>');
+    return escapedMessage.replace(/\n/g, '<br>');
 }
 
 socket.emit('join_chat', { chat_id: chatId, sender_id: senderId });
