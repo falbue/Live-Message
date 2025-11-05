@@ -5,13 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let startY;
     let startHeight;
 
-    // Минимальная высота textarea (изначальный размер)
     const initialHeight = textarea.offsetHeight;
+    const maxResizeHeight = window.innerHeight * 0.4;
 
-    // Максимальная высота — 40% экрана
-    const maxResizeHeight = window.innerHeight * 0.4; // 40% высоты экрана
-
-    // Функции для мыши
     function startDrag(e) {
         startY = e.clientY || e.touches?.[0].clientY;
         startHeight = parseInt(document.defaultView.getComputedStyle(textarea).height, 10);
@@ -19,13 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.addEventListener('mousemove', doDrag, false);
         document.documentElement.addEventListener('mouseup', stopDrag, false);
 
-        // Добавляем touch-события
         document.documentElement.addEventListener('touchmove', doDrag, { passive: false });
         document.documentElement.addEventListener('touchend', stopDrag, false);
     }
 
     function doDrag(e) {
-        e.preventDefault(); // предотвращаем прокрутку при перетаскивании
+        e.preventDefault();
         const clientY = e.clientY || e.touches?.[0].clientY;
         const newHeight = startHeight - (clientY - startY);
 
@@ -41,11 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.removeEventListener('touchend', stopDrag, false);
     }
 
-    // Назначаем оба события: мышь и тач
     handle.addEventListener('mousedown', startDrag);
     handle.addEventListener('touchstart', startDrag, { passive: false });
 
-    // Автоувеличение высоты при вводе
     textarea.addEventListener('input', autoResize);
 
     function autoResize() {
@@ -56,6 +49,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Инициализация высоты
     autoResize();
 });
