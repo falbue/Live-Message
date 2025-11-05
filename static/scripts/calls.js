@@ -46,16 +46,45 @@ function initPeerConnection(isInitiator) {
         alert('Ошибка инициализации WebRTC');
         return;
     }
-    peerConnection = new RTCPeerConnection(iceServers);
+    
+    // ДОБАВЬ ЭТОТ ОБЪЕКТ КОНФИГУРАЦИИ:
+    const configuration = {
+        iceServers: iceServers,
+        iceTransportPolicy: "relay",  // ПРИНУДИТЕЛЬНО ИСПОЛЬЗОВАТЬ TURN
+        bundlePolicy: "max-bundle",
+        rtcpMuxPolicy: "require"
+    };
+    
+    peerConnection = new RTCPeerConnection(configuration);
+
+    // ДОБАВЬ ЛОГИРОВАНИЕ СОСТОЯНИЯ:
+    peerConnection.oniceconnectionstatechange = () => {
+        console.log('ICE Connection State:', peerConnection.iceConnectionState);
+        if (peerConnection.iceConnectionState === 'failed' || 
+            peerConnection.iceConnectionState === 'disconnected') {
+            console.error('ICE connection failed:', peerConnection.iceConnectionState);
+        }
+        if (peerConnection.iceConnectionState === 'connected' || 
+            peerConnection.iceConnectionState === 'completed') {
+            console.log('✅ ICE connection successful via TURN!');
+        }
+    };
+
+    peerConnection.onconnectionstatechange = () => {
+        console.log('Connection State:', peerConnection.connectionState);
+    };
 
     peerConnection.onicecandidate = event => {
         if (event.candidate) {
+            console.log('ICE candidate:', event.candidate);
             socket.emit('webrtc:ice-candidate', {
                 chatId,
                 senderId,
                 callId,
                 candidate: event.candidate
             });
+        } else {
+            console.log('ICE gathering completed');
         }
     };
 
@@ -65,6 +94,7 @@ function initPeerConnection(isInitiator) {
             remoteVideo.srcObject = remoteStream;
         }
         remoteStream.addTrack(event.track);
+        console.log('Remote track received:', event.track.kind);
     };
 
     if (localStream) {
