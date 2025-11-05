@@ -30,7 +30,6 @@ async function loadIceServers() {
         if (!res.ok) throw new Error('Failed to load TURN config');
         const config = await res.json();
         iceServers = config;
-        console.log('ICE серверы загружены:', iceServers);
     } catch (err) {
         console.warn('Не удалось загрузить TURN-конфигурацию, используем STUN-только:', err);
         iceServers = {
