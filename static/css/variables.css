@@ -53,6 +53,9 @@
   height: 0;
 }
 
+#videoCallButton{display: none}
+#videoContainer{display: none}
+
 .show{
   visibility: visible !important;
   opacity: 1 !important;
