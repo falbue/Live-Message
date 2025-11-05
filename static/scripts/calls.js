@@ -1,16 +1,13 @@
 const audioCallButton = document.getElementById('audioCallButton');
 const videoCallButton = document.getElementById('videoCallButton');
-const incomingCall = document.getElementById('incomingCall');
 const acceptCallBtn = document.getElementById('acceptCall');
 const declineCallBtn = document.getElementById('declineCall');
 const callTypeDisplay = document.getElementById('callType');
-const endCallBtn = document.getElementById('endCall');
 const videoContainer = document.getElementById('videoContainer');
 const localVideo = document.getElementById('localVideo');
 const remoteVideo = document.getElementById('remoteVideo');
-const callControls = document.getElementById('endCall');
 
-// Состояния звонка
+// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ СОСТОЯНИЯ
 let localStream = null;
 let remoteStream = null;
 let peerConnection = null;
@@ -20,7 +17,7 @@ let callTimeout = null;
 let callId = null;
 let pendingOffer = null;
 
-// Конфигурация WebRTC
+// КОНФИГУРАЦИЯ WEBRTC
 const iceServers = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
@@ -28,7 +25,7 @@ const iceServers = {
     ]
 };
 
-// Инициализация PeerConnection
+// ИНИЦИАЛИЗАЦИЯ PEER CONNECTION
 function initPeerConnection(isInitiator) {
     peerConnection = new RTCPeerConnection(iceServers);
 
@@ -58,7 +55,7 @@ function initPeerConnection(isInitiator) {
     }
 }
 
-// Получение медиапотока
+// УПРАВЛЕНИЕ МЕДИАПОТОКОМ
 async function getMedia(type) {
     try {
         const constraints = {
@@ -80,17 +77,16 @@ async function getMedia(type) {
     }
 }
 
-// Начало звонка (звонящий)
+// УПРАВЛЕНИЕ ЗВОНКАМИ
 async function startCall(type) {
     if (!await getMedia(type)) return;
 
     isCaller = true;
     currentCallType = type;
     callId = Date.now().toString(36) + Math.random().toString(36).substr(2);
-
+    
+    declineCallBtn.classList.remove('hidden');
     toggleCallButtons(false);
-    callControls.classList.remove('hidden');
-
     initPeerConnection(true);
 
     try {
@@ -121,7 +117,6 @@ async function startCall(type) {
     }
 }
 
-// Принятие звонка (вызываемый)
 async function acceptCall() {
     clearTimeout(callTimeout);
 
@@ -137,20 +132,15 @@ async function acceptCall() {
     }
     
     acceptCallBtn.classList.add('hidden');
-    declineCallBtn.classList.add('hidden');
-    callControls.classList.remove('hidden');
 
     initPeerConnection(false);
 
     try {
-        // Устанавливаем remote description (offer от вызывающего)
         await peerConnection.setRemoteDescription(pendingOffer);
 
-        // Создаём answer
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
 
-        // Отправляем ответ
         socket.emit('call:response', {
             chatId,
             senderId,
@@ -170,7 +160,6 @@ async function acceptCall() {
     }
 }
 
-// Отклонение звонка
 function declineCall() {
     clearTimeout(callTimeout);
     acceptCallBtn.classList.add('hidden');
@@ -187,7 +176,6 @@ function declineCall() {
     endCall();
 }
 
-// Завершение звонка
 function endCall() {
     if (peerConnection) {
         peerConnection.close();
@@ -207,7 +195,6 @@ function endCall() {
     localVideo.srcObject = null;
     remoteVideo.srcObject = null;
     videoContainer.classList.add('hidden');
-    callControls.classList.add('hidden');
 
     acceptCallBtn.classList.add('hidden');
     declineCallBtn.classList.add('hidden');
@@ -227,7 +214,8 @@ function endCall() {
     }
 }
 
-// Настройка видео-контейнера
+
+// УПРАВЛЕНИЕ ВИДЕО ИНТЕРФЕЙСОМ
 function setupVideoContainer(show) {
     if (!show) {
         videoContainer.classList.add('hidden');
@@ -242,7 +230,6 @@ function setupVideoContainer(show) {
     remoteVideo.onclick = () => toggleFullscreen(remoteVideo);
 }
 
-// Полноэкранный режим
 function toggleFullscreen(videoElement) {
     if (!document.fullscreenElement) {
         videoElement.classList.remove('mini');
@@ -259,28 +246,27 @@ function toggleFullscreen(videoElement) {
     }
 }
 
-// Управление кнопками звонков
 function toggleCallButtons(show) {
     audioCallButton.classList.toggle('hidden', !show);
     videoCallButton.classList.toggle('hidden', !show);
 }
 
-// Слушатели событий
+
+// ОБРАБОТКА СОБЫТИЙ ПОЛЬЗОВАТЕЛЯ
 audioCallButton?.addEventListener('click', () => startCall('audio'));
 videoCallButton?.addEventListener('click', () => startCall('video'));
 acceptCallBtn?.addEventListener('click', acceptCall);
 declineCallBtn?.addEventListener('click', declineCall);
-endCallBtn?.addEventListener('click', declineCall);
 
-// Сокет-события
+
+// ОБРАБОТКА СОКЕТ-СОБЫТИЙ
 socket.on('call:incoming', data => {
     if (data.senderId === senderId) return;
 
     currentCallType = data.type;
     callId = data.callId;
-    pendingOffer = data.sdp; // сохраняем offer (объект {type, sdp})
+    pendingOffer = data.sdp;
 
-    // callTypeDisplay.textContent = data.type === 'video' ? 'видео' : 'аудио';
     acceptCallBtn.classList.remove('hidden');
     declineCallBtn.classList.remove('hidden');
     notification("Поступил звонок");
@@ -296,7 +282,6 @@ socket.on('call:accepted', async data => {
 
     clearTimeout(callTimeout);
     acceptCallBtn.classList.add('hidden');
-    declineCallBtn.classList.add('hidden');
 
     try {
         await peerConnection.setRemoteDescription(data.sdp);
@@ -314,15 +299,6 @@ socket.on('call:rejected', data => {
     endCall();
 });
 
-socket.on('call:ended', data => {
-    console.log("раб1")
-    if (data.callId !== callId) return;
-    console.log("раб2")
-    clearTimeout(callTimeout);
-    notification('Звонок отклонён');
-    endCall();
-});
-
 socket.on('webrtc:ice-candidate', async data => {
     if (data.senderId === senderId || !peerConnection) return;
 
@@ -333,7 +309,8 @@ socket.on('webrtc:ice-candidate', async data => {
     }
 });
 
-// Обработка выхода из полноэкранного режима
+
+// ОБРАБОТКА СИСТЕМНЫХ СОБЫТИЙ
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
         localVideo?.classList.add('mini');
