@@ -39,19 +39,11 @@ def handle_call_request(data):
 
 @socketio.on('call:response')
 def handle_call_response(data):
-    """Обработка ответа на звонок"""
     chat_id = data['chatId']
     if data['accepted']:
-        # Перенаправляем подтверждение отправителю
         socketio.emit('call:accepted', data, room=chat_id, skip_sid=request.sid)
     else:
         socketio.emit('call:rejected', data, room=chat_id, skip_sid=request.sid)
-
-@socketio.on('call:ended')
-def handle_call_end(data):
-    """Обработка завершения звонка"""
-    chat_id = data['chatId']
-    socketio.emit('call:ended', data, room=chat_id, skip_sid=request.sid)
 
 # WebRTC сигнализация
 @socketio.on('webrtc:offer')

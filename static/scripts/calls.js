@@ -89,14 +89,26 @@ async function getMedia(video = false) {
             });
         }
 
-        muteButton.classList.remove('hidden');
-
         return true;
     } catch (error) {
         console.error('Ошибка получения медиа:', error);
         alert('Не удалось получить доступ к микрофону/камере');
         return false;
     }
+}
+
+// УПРАВЛЕНИЕ ВИДИМОСТЬЮ КНОПОК
+function hideAllButtons() {
+    audioCallButton.classList.add('hidden');
+    videoCallButton.classList.add('hidden');
+    muteButton.classList.add('hidden');
+    acceptCallBtn.classList.add('hidden');
+    declineCallBtn.classList.add('hidden');
+}
+
+function showButtons(buttons) {
+    hideAllButtons();
+    buttons.forEach(btn => btn.classList.remove('hidden'));
 }
 
 // НАЧАЛО АУДИОЗВОНКА
@@ -107,10 +119,7 @@ async function startCall() {
     callType = 'audio';
     callId = Date.now().toString(36) + Math.random().toString(36).substr(2);
 
-    declineCallBtn.classList.remove('hidden');
-    audioCallButton.classList.add('hidden');
-    videoCallButton.classList.remove('hidden');
-    muteButton.classList.remove('hidden');
+    showButtons([videoCallButton, muteButton, declineCallBtn]);
     initPeerConnection(true);
 
     try {
@@ -196,10 +205,7 @@ async function acceptCall() {
         return;
     }
 
-    acceptCallBtn.classList.add('hidden');
-    videoCallButton.classList.remove('hidden');
-    muteButton.classList.remove('hidden');
-
+    showButtons([videoCallButton, muteButton, declineCallBtn]);
     initPeerConnection(false);
 
     try {
@@ -223,12 +229,9 @@ async function acceptCall() {
     }
 }
 
-
 function declineCall() {
     clearTimeout(callTimeout);
-    acceptCallBtn.classList.add('hidden');
-    declineCallBtn.classList.add('hidden');
-    toggleCallButtons(true);
+    showButtons([audioCallButton]);
 
     socket.emit('call:response', {
         chatId,
@@ -260,10 +263,7 @@ function endCall() {
     remoteVideo.srcObject = null;
     videoContainer.classList.add('hidden');
 
-    acceptCallBtn.classList.add('hidden');
-    declineCallBtn.classList.add('hidden');
-    toggleCallButtons(true);
-    muteButton.classList.add('hidden');
+    showButtons([audioCallButton]);
 
     clearTimeout(callTimeout);
     callId = null;
@@ -271,19 +271,6 @@ function endCall() {
     isCaller = false;
     isVideoEnabled = false;
     isMuted = false;
-
-    if (callId) {
-        socket.emit('call:ended', {
-            chatId,
-            senderId,
-            callId
-        });
-    }
-}
-
-function toggleCallButtons(show) {
-    audioCallButton.classList.toggle('hidden', !show);
-    videoCallButton.classList.toggle('hidden', show);
 }
 
 // ОБРАБОТКА СОБЫТИЙ ПОЛЬЗОВАТЕЛЯ
@@ -301,10 +288,8 @@ socket.on('call:incoming', data => {
     callId = data.callId;
     pendingOffer = data.sdp;
 
-    acceptCallBtn.classList.remove('hidden');
-    declineCallBtn.classList.remove('hidden');
+    showButtons([acceptCallBtn, declineCallBtn]);
     notification("Поступил звонок");
-    toggleCallButtons(false);
 
     callTimeout = setTimeout(() => {
         declineCall();
@@ -315,7 +300,7 @@ socket.on('call:accepted', async data => {
     if (data.callId !== callId) return;
 
     clearTimeout(callTimeout);
-    acceptCallBtn.classList.add('hidden');
+    showButtons([videoCallButton, muteButton, declineCallBtn]);
 
     try {
         await peerConnection.setRemoteDescription(data.sdp);
