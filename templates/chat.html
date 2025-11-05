@@ -9,27 +9,40 @@
         <p id="displayMessage"><b></b></p>
     </div>
     
-    <textarea id="inputMessage" placeholder="Введите сообщение..." inputmode="text"></textarea>
+    <div class="input-message">
+        <nav>
+            <div id="videoContainer" class="hidden">
+                <video id="localVideo" autoplay muted playsinline></video>
+                <video id="remoteVideo" autoplay playsinline></video>
+            </div>
 
-    <nav>
-        <div id="videoContainer" class="hidden">
-            <video id="localVideo" autoplay muted playsinline></video>
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
-        
-        <div class="buttons">
-            <button id="muteButton" class="hidden"><i class="iconoir-microphone"></i></button>
-            <button id="videoCallButton" class="hidden"><i class="iconoir-video-camera"></i></button>
-            <button id="acceptCall" class="call-btn accept hidden"><i class="iconoir-phone"></i></button>
-            <button id="declineCall" class="call-btn decline hidden"><i class="iconoir-phone-disabled"></i></button>
-            <button id="audioCallButton"><i class="iconoir-phone"></i></button>
-            <button id="shareButton"><i class="iconoir-share-android"></i></button>
-        </div>
-    </nav>
+            <div class="buttons">
+                <button id="muteButton" class="hidden"><i class="iconoir-microphone"></i></button>
+                <button id="videoCallButton" class="hidden"><i class="iconoir-video-camera"></i></button>
+                <button id="acceptCall" class="call-btn accept hidden"><i class="iconoir-phone"></i></button>
+                <button id="declineCall" class="call-btn decline hidden"><i class="iconoir-phone-disabled"></i></button>
+                <button id="audioCallButton"><i class="iconoir-phone"></i></button>
+                <button id="shareButton"><i class="iconoir-share-android"></i></button>
+            </div>
+        </nav>
+        <textarea id="inputMessage" placeholder="Введите сообщение..." inputmode="text"></textarea>
+    </div>
 </main>
 
 <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/calls.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/share.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/notification.js') }}" defer></script>
+
+<script>
+    if ('visualViewport' in window) {
+        window.visualViewport.addEventListener('resize', () => {
+            document.documentElement.style.setProperty('--vh', `${window.visualViewport.height}px`);
+        });
+    } else {
+        window.addEventListener('resize', () => {
+            document.documentElement.style.setProperty('--vh', `${window.innerHeight}px`);
+        });
+    }
+</script>
 {% endblock %}

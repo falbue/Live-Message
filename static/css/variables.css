@@ -7,6 +7,8 @@
   --white: #E8D7FF;
   --red: #F44336;
   --green: #4CAF50;
+
+  --vh: 100dvh;
 }
 
 
@@ -38,11 +40,16 @@
 
 .hidden {
     visibility: hidden !important;
-    width: 0;
-    height: 0;
     padding: 0;
     margin: 0;
     font-size: 0;
+    opacity: 0;
+    pointer-events: none !important;
+}
+.hidden * {
+  visibility: hidden !important;
+  width: 0;
+  height: 0;
 }
 
 .show{

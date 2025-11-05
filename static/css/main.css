@@ -11,14 +11,14 @@
 }
 
 
-html, body{
-	background-color: var(--backgrond);
-	height: 100%;
-}
+html, body{background-color: var(--backgrond);}
 
 main{
-	height: 100%;
+	height: var(--vh);
 	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
 
 a{text-decoration: none;}
@@ -66,10 +66,14 @@ button,
 button>i,
 .button>i{font-size: 1.2rem}
 
+.input-message{
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
 nav {
-	position: fixed;
-	inset: auto auto 110px auto;
-	will-change: transform;
+	position: absolute;
 	z-index: 100;
 	display: flex;
 	align-items: flex-end;
@@ -143,7 +147,6 @@ nav>.buttons{
 }
 
 textarea {
-	position: absolute;
 	background-color: var(--input);
 	color: var(--text-color);
 	font-size: 24px;
@@ -152,7 +155,6 @@ textarea {
 	border: none;
 	resize: none;
 	box-sizing: border-box;
-	bottom: 0;
 	min-height: 5vh;
 }
 
@@ -183,9 +185,15 @@ code {
 	box-sizing: border-box;
 }
 
-.chat{
-	padding: 12px;
-	font-size: 1.2rem;
+.chat {
+    flex: 1;
+    padding: 12px;
+    font-size: 1.2rem;
+    min-height: 0;
+    overflow-y: auto;
+    max-height: 100%;
+    cursor: text;
+
 }
 
 
