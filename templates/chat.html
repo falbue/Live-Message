@@ -12,20 +12,50 @@
     <textarea id="inputMessage" placeholder="Введите сообщение..." inputmode="text"></textarea>
 
     <nav>
-        <div id="videoContainer" class="hidden">
-            <video id="localVideo" autoplay muted playsinline></video>
-            <video id="remoteVideo" autoplay playsinline></video>
+        <div id="videoContainer" class="hidden"></div>
+        
+        <div class="call-controls hidden">
+            <button id="toggleCamera" class="call-btn hidden"><i class="iconoir-camera"></i></button>
+            <button id="toggleMic" class="call-btn hidden"><i class="iconoir-mic"></i></button>
         </div>
         
         <div class="buttons">
-            <button id="acceptCall" class="call-btn accept hidden"><i class="iconoir-phone"></i></button>
             <button id="declineCall" class="call-btn decline hidden"><i class="iconoir-phone-disabled"></i></button>
-            <button id="endCall" class="call-btn end hidden"><i class="iconoir-phone-disabled"></i></button>
-            <button id="audioCallButton"><i class="iconoir-phone"></i></button>
-            <button id="videoCallButton"><i class="iconoir-camera"></i></button>
+            <button id="createCall"><i class="iconoir-phone"></i></button>
             <button id="shareButton"><i class="iconoir-share-android"></i></button>
         </div>
     </nav>
+    
+    <!-- Модальное окно для входящего звонка -->
+    <div id="incomingCallModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Входящий вызов</h3>
+            <p id="callerName">Пользователь</p>
+            <div class="settings-options">
+                <label><input type="checkbox" id="incomingUseCamera" checked> Камера</label>
+                <label><input type="checkbox" id="incomingUseMicrophone" checked> Микрофон</label>
+            </div>
+            <div class="modal-buttons">
+                <button id="acceptCall" class="call-btn"><i class="iconoir-phone"></i></button>
+                <button id="rejectCall" class="call-btn decline"><i class="iconoir-phone-disabled"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно для настроек медиа -->
+    <div id="mediaSettingsModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Тип звонка</h3>
+            <div class="settings-options">
+                <label><input type="radio" name="callType" value="video" checked> Видео + Аудио</label>
+                <label><input type="radio" name="callType" value="audio"> Только аудио</label>
+                <label><input type="radio" name="callType" value="listen"> Только слушать</label>
+            </div>
+            <div class="modal-buttons">
+                <button id="startCallButton" class="call-btn">Начать звонок</button>
+            </div>
+        </div>
+    </div>
 </main>
 
 <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>

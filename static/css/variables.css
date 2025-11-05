@@ -47,3 +47,72 @@
   visibility: visible !important;
   opacity: 1 !important;
 }
+
+
+
+
+
+
+.settings-options {
+    margin: 15px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.settings-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.video-placeholder {
+    background: #333;
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 5px;
+    text-align: center;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.modal-buttons button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+}
+
+#localVideo .video-placeholder {
+    background: #222;
+}
+
+#mediaSettingsModal .modal-content,
+#incomingCallModal .modal-content {
+    max-width: 90%;
+    width: 350px;
+}
+
+@media (max-width: 480px) {
+    .settings-options {
+        font-size: 0.85rem;
+    }
+    
+    .modal-buttons button {
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+    }
+}

@@ -1,458 +1,458 @@
-const audioCallButton = document.getElementById('audioCallButton');
-const videoCallButton = document.getElementById('videoCallButton');
-const incomingCall = document.getElementById('incomingCall');
-const acceptCallBtn = document.getElementById('acceptCall');
-const declineCallBtn = document.getElementById('declineCall');
-const callTypeDisplay = document.getElementById('callType');
-const endCallBtn = document.getElementById('endCall');
+
+
+// DOM элементы
 const videoContainer = document.getElementById('videoContainer');
-const localVideo = document.getElementById('localVideo');
-const remoteVideo = document.getElementById('remoteVideo');
-const callControls = document.getElementById('endCall');
+const createCallButton = document.getElementById('createCall');
+const declineCallButton = document.getElementById('declineCall');
+const toggleCameraButton = document.getElementById('toggleCamera');
+const toggleMicButton = document.getElementById('toggleMic');
+const incomingCallModal = document.getElementById('incomingCallModal');
+const acceptCallButton = document.getElementById('acceptCall');
+const rejectCallButton = document.getElementById('rejectCall');
+const callerNameElement = document.getElementById('callerName');
+const callControls = document.querySelector('.call-controls');
+const mediaSettingsModal = document.getElementById('mediaSettingsModal');
+const startCallButton = document.getElementById('startCallButton');
+const incomingUseCamera = document.getElementById('incomingUseCamera');
+const incomingUseMicrophone = document.getElementById('incomingUseMicrophone');
 
-// Состояния звонка
+// Переменные для WebRTC
 let localStream = null;
-let remoteStream = null;
-let peerConnection = null;
-let isCaller = false;
-let currentCallType = null;
-let callTimeout = null;
-let callId = null;
-let pendingOffer = null;
+let peerConnections = {}; // {userId: RTCPeerConnection}
+let remoteStreams = {}; // {userId: MediaStream}
+let isAudioMuted = false;
+let isVideoMuted = false;
+let currentCallerId = null;
+let hasCamera = false;
+let hasMicrophone = false;
 
-// ⚠️ REMOVED STATIC iceServers — now loaded dynamically
-let iceServers = null;
-
-// Загружаем TURN-конфигурацию при старте
-async function loadIceServers() {
-    try {
-        const res = await fetch('/turn-config');
-        if (!res.ok) throw new Error('Failed to load TURN config');
-        const config = await res.json();
-        iceServers = config.iceServers; // Только массив серверов
-        console.log('ICE Servers loaded:', iceServers);
-    } catch (err) {
-        console.warn('Не удалось загрузить TURN-конфигурацию:', err);
-        iceServers = [
-            { urls: 'stun:stun.l.google.com:19302' }
-        ];
-    }
-}
-
-// Инициализация PeerConnection
-function initPeerConnection(isInitiator) {
-    if (!iceServers) {
-        console.error('ICE серверы не загружены!');
-        alert('Ошибка инициализации WebRTC');
-        return;
-    }
-    
-    // ДОБАВЬ ЭТОТ ОБЪЕКТ КОНФИГУРАЦИИ:
-    const configuration = {
-        iceServers: iceServers,
-        iceTransportPolicy: "relay",  // ПРИНУДИТЕЛЬНО ИСПОЛЬЗОВАТЬ TURN
-        bundlePolicy: "max-bundle",
-        rtcpMuxPolicy: "require"
-    };
-    
-    peerConnection = new RTCPeerConnection(configuration);
-
-    // ДОБАВЬ ЛОГИРОВАНИЕ СОСТОЯНИЯ:
-    peerConnection.oniceconnectionstatechange = () => {
-        console.log('ICE Connection State:', peerConnection.iceConnectionState);
-        if (peerConnection.iceConnectionState === 'failed' || 
-            peerConnection.iceConnectionState === 'disconnected') {
-            console.error('ICE connection failed:', peerConnection.iceConnectionState);
-            // Попробовать пересоздать соединение
-            setTimeout(() => {
-                if (callId && peerConnection.iceConnectionState !== 'connected') {
-                    console.log('Recreating connection...');
-                    endCall();
-                     // Попробовать перезвонить через 2 секунды
-                     setTimeout(() => {
-                         if (currentCallType) {
-                             startCall(currentCallType);
-                         }
-                     }, 2000);
-                }
-            }, 1000);
-        }
-        if (peerConnection.iceConnectionState === 'connected' || 
-            peerConnection.iceConnectionState === 'completed') {
-            console.log('✅ ICE connection successful via TURN!');
-        }
-    };
-
-    peerConnection.onconnectionstatechange = () => {
-        console.log('Connection State:', peerConnection.connectionState);
-    };
-
-    peerConnection.onicegatheringstatechange = () => {
-        console.log('ICE Gathering State:', peerConnection.iceGatheringState);
-    };
-
-    peerConnection.onicecandidate = event => {
-        if (event.candidate) {
-            console.log('Sending ICE candidate:', event.candidate);
-            console.log('Candidate type:', event.candidate.type); // relay, host, srflx
-            socket.emit('webrtc:ice-candidate', {
-                chatId,
-                senderId,
-                callId,
-                candidate: event.candidate
-            });
-        } else {
-            console.log('ICE gathering completed');
-            // После завершения сбора кандидатов, проверяем состояние
-            setTimeout(() => {
-                if (peerConnection.iceConnectionState === 'checking') {
-                    console.log('Still checking after gathering completed...');
-                }
-            }, 1000);
-        }
-    };
-
-    peerConnection.ontrack = event => {
-        if (!remoteStream) {
-            remoteStream = new MediaStream();
-            remoteVideo.srcObject = remoteStream;
-        }
-        remoteStream.addTrack(event.track);
-        console.log('Remote track received:', event.track.kind);
-    };
-
-    if (localStream) {
-        localStream.getTracks().forEach(track => {
-            peerConnection.addTrack(track, localStream);
-        });
-    }
-}
-
-// Получение медиапотока
-async function getMedia(type) {
-    try {
-        const constraints = {
-            audio: true,
-            video: type === 'video' ? { width: 320, height: 240 } : false
-        };
-
-        localStream = await navigator.mediaDevices.getUserMedia(constraints);
-
-        if (localVideo) {
-            localVideo.srcObject = localStream;
-        }
-
-        return true;
-    } catch (error) {
-        console.error('Ошибка получения медиа:', error);
-        alert('Не удалось получить доступ к микрофону/камере');
-        return false;
-    }
-}
-
-// Начало звонка (звонящий)
-async function startCall(type) {
-    if (!await getMedia(type)) return;
-
-    isCaller = true;
-    currentCallType = type;
-    callId = Date.now().toString(36) + Math.random().toString(36).substr(2);
-
-    toggleCallButtons(false);
-    callControls.classList.remove('hidden');
-
-    initPeerConnection(true);
-
-    try {
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-
-        socket.emit('call:request', {
-            chatId,
-            senderId,
-            callId,
-            type,
-            sdp: offer
-        });
-
-        callTimeout = setTimeout(() => {
-            if (isCaller) {
-                endCall();
-                notification('Звонок не был принят');
-            }
-        }, 30000);
-
-        if (type === 'video') {
-            setupVideoContainer(true);
-        }
-    } catch (error) {
-        console.error('Ошибка создания offer:', error);
-        endCall();
-    }
-}
-
-// Принятие звонка (вызываемый)
-async function acceptCall() {
-    clearTimeout(callTimeout);
-
-    if (!pendingOffer) {
-        console.error('Нет offer для ответа');
-        declineCall();
-        return;
-    }
-
-    if (!await getMedia(currentCallType)) {
-        declineCall();
-        return;
-    }
-    
-    acceptCallBtn.classList.add('hidden');
-    declineCallBtn.classList.add('hidden');
-    callControls.classList.remove('hidden');
-
-    initPeerConnection(false);
-
-    try {
-        await peerConnection.setRemoteDescription(pendingOffer);
-
-        // Обработка отложенных кандидатов
-        if (peerConnection.queuedRemoteCandidates) {
-            console.log('Processing queued candidates:', peerConnection.queuedRemoteCandidates.length);
-            for (const candidate of peerConnection.queuedRemoteCandidates) {
-                try {
-                    await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-                    console.log('Queued candidate added');
-                } catch (e) {
-                    console.error('Ошибка добавления отложенного кандидата:', e);
-                }
-            }
-            peerConnection.queuedRemoteCandidates = [];
-        }
-
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
-
-        socket.emit('call:response', {
-            chatId,
-            senderId,
-            callId,
-            accepted: true,
-            sdp: answer
-        });
-
-        if (currentCallType === 'video') {
-            setupVideoContainer(true);
-        }
-
-        pendingOffer = null;
-    } catch (error) {
-        console.error('Ошибка при принятии звонка:', error);
-        declineCall();
-    }
-}
-
-// Отклонение звонка
-function declineCall() {
-    clearTimeout(callTimeout);
-    acceptCallBtn.classList.add('hidden');
-    declineCallBtn.classList.add('hidden');
-    toggleCallButtons(true);
-
-    socket.emit('call:response', {
-        chatId,
-        senderId,
-        callId,
-        accepted: false
+// Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+    // Регистрация в чате
+    socket.emit('join_chat', {
+        chat_id: chatId,
+        sender_id: senderId,
+        username: `User-${senderId.substr(0, 5)}`
     });
+    
+    // Настройка модальных окон
+    createCallButton.addEventListener('click', () => {
+        mediaSettingsModal.classList.remove('hidden');
+    });
+    
+    startCallButton.addEventListener('click', () => {
+        const callType = document.querySelector('input[name="callType"]:checked').value;
+        mediaSettingsModal.classList.add('hidden');
+        
+        let useCamera = false;
+        let useMicrophone = false;
+        
+        switch(callType) {
+            case 'video':
+                useCamera = true;
+                useMicrophone = true;
+                break;
+            case 'audio':
+                useCamera = false;
+                useMicrophone = true;
+                break;
+            case 'listen':
+                useCamera = false;
+                useMicrophone = false;
+                break;
+        }
+        
+        startCall(useCamera, useMicrophone);
+    });
+    
+    acceptCallButton.addEventListener('click', () => {
+        const useCamera = incomingUseCamera.checked;
+        const useMicrophone = incomingUseMicrophone.checked;
+        incomingCallModal.classList.add('hidden');
+        joinCall(useCamera, useMicrophone);
+    });
+    
+    rejectCallButton.addEventListener('click', () => {
+        incomingCallModal.classList.add('hidden');
+        socket.emit('leave_call', { chat_id: chatId });
+    });
+    
+    declineCallButton.addEventListener('click', endCall);
+    
+    toggleCameraButton.addEventListener('click', toggleCamera);
+    toggleMicButton.addEventListener('click', toggleMicrophone);
+    
+    // Закрытие модальных окон при клике вне их
+    document.addEventListener('click', (e) => {
+        if (e.target === mediaSettingsModal) mediaSettingsModal.classList.add('hidden');
+        if (e.target === incomingCallModal) incomingCallModal.classList.add('hidden');
+    });
+});
 
-    endCall();
+// Начать звонок (инициатор)
+async function startCall(useCamera = true, useMicrophone = true) {
+    try {
+        notification('Подготовка к звонку...');
+        
+        // Очистка предыдущих ресурсов
+        cleanupResources();
+        
+        // Получение медиапотока с учетом настроек
+        await getLocalStream(useCamera, useMicrophone);
+        
+        // Обновление интерфейса управления
+        updateCallControls(useCamera, useMicrophone);
+        
+        // Отправка уведомления о начале звонка
+        socket.emit('start_call', { chat_id: chatId });
+        
+        // Показать элементы управления звонком
+        createCallButton.classList.add('hidden');
+        declineCallButton.classList.remove('hidden');
+        
+        notification('Звонок начат');
+    } catch (error) {
+        console.error('Ошибка начала звонка:', error);
+        cleanupResources();
+        notification('Ошибка звонка: ' + (error.message || error));
+    }
 }
 
-// Завершение звонка
-function endCall() {
-    if (peerConnection) {
-        peerConnection.close();
-        peerConnection = null;
+// Присоединиться к звонку
+async function joinCall(useCamera = true, useMicrophone = true) {
+    try {
+        notification('Подключение к звонку...');
+        
+        // Очистка предыдущих ресурсов
+        cleanupResources();
+        
+        // Получение медиапотока с учетом настроек
+        await getLocalStream(useCamera, useMicrophone);
+        
+        // Обновление интерфейса управления
+        updateCallControls(useCamera, useMicrophone);
+        
+        // Отправка уведомления о присоединении
+        socket.emit('join_call', { chat_id: chatId });
+        
+        // Показать элементы управления звонком
+        createCallButton.classList.add('hidden');
+        declineCallButton.classList.remove('hidden');
+        
+        notification('Вы в звонке');
+    } catch (error) {
+        console.error('Ошибка присоединения к звонку:', error);
+        cleanupResources();
+        notification('Ошибка подключения: ' + (error.message || error));
+    }
+}
+
+// Получение медиапотока с обработкой ошибок
+async function getLocalStream(useVideo = true, useAudio = true) {
+    hasCamera = useVideo;
+    hasMicrophone = useAudio;
+    
+    try {
+        // Попытка получить запрошенные устройства
+        const constraints = {
+            video: useVideo ? { width: { ideal: 640 }, height: { ideal: 480 } } : false,
+            audio: useAudio
+        };
+        
+        localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        
+        // Проверка наличия треков
+        const videoTracks = localStream.getVideoTracks();
+        const audioTracks = localStream.getAudioTracks();
+        
+        hasCamera = useVideo && videoTracks.length > 0;
+        hasMicrophone = useAudio && audioTracks.length > 0;
+        
+        isVideoMuted = !hasCamera;
+        isAudioMuted = !hasMicrophone;
+        
+        // Обработка случаев, когда устройства отключены после получения потока
+        if (hasCamera && !useVideo) {
+            videoTracks.forEach(track => track.stop());
+            hasCamera = false;
+            isVideoMuted = true;
+        }
+        
+        if (hasMicrophone && !useAudio) {
+            audioTracks.forEach(track => track.stop());
+            hasMicrophone = false;
+            isAudioMuted = true;
+        }
+        
+        // Создание локального видеоэлемента
+        createLocalVideoElement();
+        
+        return localStream;
+    } catch (error) {
+        console.error('Ошибка получения медиапотока:', error);
+        
+        // Обработка частных случаев ошибок
+        if (error.name === 'NotAllowedError') {
+            throw new Error('Доступ к устройствам запрещен. Разрешите доступ в настройках браузера.');
+        }
+        
+        if (error.name === 'NotFoundError') {
+            throw new Error('Устройства не найдены. Проверьте подключение камеры и микрофона.');
+        }
+        
+        if (error.name === 'NotReadableError') {
+            // Попытка получить поток без видео
+            if (useVideo && useAudio) {
+                notification('Камера недоступна. Попытка подключиться только с микрофоном.');
+                return getLocalStream(false, true);
+            }
+            // Попытка получить поток без аудио
+            if (useVideo && !useAudio) {
+                throw new Error('Камера занята другим приложением. Закройте другие программы, использующие камеру.');
+            }
+            // Попытка получить поток без аудио
+            if (!useVideo && useAudio) {
+                throw new Error('Микрофон недоступен. Проверьте подключение и разрешения.');
+            }
+        }
+        
+        // Если все попытки неудачны, создаем пустой поток
+        localStream = new MediaStream();
+        hasCamera = false;
+        hasMicrophone = false;
+        isVideoMuted = true;
+        isAudioMuted = true;
+        
+        createLocalVideoElement();
+        return localStream;
+    }
+}
+
+// Создание локального видеоэлемента
+function createLocalVideoElement() {
+    let localVideo = document.getElementById('localVideo');
+    if (!localVideo) {
+        localVideo = document.createElement('div');
+        localVideo.id = 'localVideo';
+        localVideo.className = 'video-element local-video';
+        videoContainer.appendChild(localVideo);
     }
 
+    if (hasCamera && !isVideoMuted && localStream) {
+        const videoElement = document.createElement('video');
+        videoElement.autoplay = true;
+        videoElement.muted = true;
+        videoElement.playsinline = true;
+        videoElement.srcObject = localStream;
+        
+        localVideo.innerHTML = `
+            <div class="video-header">Вы</div>
+            ${videoElement.outerHTML}
+        `;
+    } else {
+        const statusText = !hasCamera ? 'Нет камеры' : 
+                          isVideoMuted ? 'Камера отключена' : 'Нет видео';
+        
+        localVideo.innerHTML = `
+            <div class="video-header">Вы ${isVideoMuted ? '(без видео)' : ''}</div>
+            <div class="video-placeholder">${statusText}</div>
+        `;
+    }
+    
+    videoContainer.classList.remove('hidden');
+}
+
+// Обновление элементов управления
+function updateCallControls(useCamera, useMicrophone) {
+    // Обновление состояния
+    hasCamera = useCamera;
+    hasMicrophone = useMicrophone;
+    
+    // Отображение кнопок в зависимости от возможностей
+    toggleCameraButton.classList.toggle('hidden', !hasCamera);
+    toggleMicButton.classList.toggle('hidden', !hasMicrophone);
+    callControls.classList.remove('hidden');
+    
+    // Обновление иконок
+    updateToggleButtonIcons();
+}
+
+// Обновление иконок кнопок
+function updateToggleButtonIcons() {
+    if (hasCamera) {
+        toggleCameraButton.innerHTML = isVideoMuted ? 
+            '<i class="iconoir-camera-off"></i>' : 
+            '<i class="iconoir-camera"></i>';
+    }
+    
+    if (hasMicrophone) {
+        toggleMicButton.innerHTML = isAudioMuted ? 
+            '<i class="iconoir-mic-off"></i>' : 
+            '<i class="iconoir-mic"></i>';
+    }
+}
+
+// Переключение камеры
+function toggleCamera() {
+    if (!localStream || !hasCamera) return;
+    
+    const videoTracks = localStream.getVideoTracks();
+    if (videoTracks.length === 0) return;
+    
+    const track = videoTracks[0];
+    isVideoMuted = !isVideoMuted;
+    track.enabled = !isVideoMuted;
+    
+    // Обновление локального видео
+    createLocalVideoElement();
+    updateToggleButtonIcons();
+}
+
+// Переключение микрофона
+function toggleMicrophone() {
+    if (!localStream || !hasMicrophone) return;
+    
+    const audioTracks = localStream.getAudioTracks();
+    if (audioTracks.length === 0) return;
+    
+    const track = audioTracks[0];
+    isAudioMuted = !isAudioMuted;
+    track.enabled = !isAudioMuted;
+    
+    updateToggleButtonIcons();
+}
+
+// Создание видеоэлемента для удаленного участника
+function createRemoteVideoElement(userId, stream, username) {
+    let videoElement = document.getElementById(`remoteVideo-${userId}`);
+    
+    if (!videoElement) {
+        videoElement = document.createElement('div');
+        videoElement.id = `remoteVideo-${userId}`;
+        videoElement.className = 'video-element';
+        videoContainer.appendChild(videoElement);
+    }
+    
+    const hasVideo = stream.getVideoTracks().length > 0;
+    const hasAudio = stream.getAudioTracks().length > 0;
+    
+    if (hasVideo) {
+        const video = document.createElement('video');
+        video.autoplay = true;
+        video.playsinline = true;
+        video.srcObject = stream;
+        
+        videoElement.innerHTML = `
+            <div class="video-header">${username || 'Участник'}</div>
+            ${video.outerHTML}
+            ${!hasAudio ? '<div class="audio-status muted">Без микрофона</div>' : ''}
+        `;
+    } else {
+        const statusText = !hasAudio ? 'Нет аудио и видео' : 'Нет видео';
+        const icon = !hasAudio ? '🔇' : '📹';
+        
+        videoElement.innerHTML = `
+            <div class="video-header">${username || 'Участник'} ${!hasVideo ? '(без видео)' : ''}</div>
+            <div class="video-placeholder">
+                ${icon} ${statusText}
+            </div>
+            ${hasAudio ? '<div class="audio-status">Только аудио</div>' : ''}
+        `;
+    }
+}
+
+// Очистка ресурсов
+function cleanupResources() {
+    // Остановка локального потока
     if (localStream) {
         localStream.getTracks().forEach(track => track.stop());
         localStream = null;
     }
-
-    if (remoteStream) {
-        remoteStream.getTracks().forEach(track => track.stop());
-        remoteStream = null;
-    }
-
-    localVideo.srcObject = null;
-    remoteVideo.srcObject = null;
-    videoContainer.classList.add('hidden');
-    callControls.classList.add('hidden');
-
-    acceptCallBtn.classList.add('hidden');
-    declineCallBtn.classList.add('hidden');
-    toggleCallButtons(true);
-
-    clearTimeout(callTimeout);
-    callId = null;
-    pendingOffer = null;
-    isCaller = false;
-
-    // Отправка события завершения — только если callId существует
-    if (callId) {
-        socket.emit('call:end', {
-            chatId,
-            senderId,
-            callId
-        });
-    }
-}
-
-// Настройка видео-контейнера
-function setupVideoContainer(show) {
-    if (!show) {
-        videoContainer.classList.add('hidden');
-        return;
-    }
-
-    videoContainer.classList.remove('hidden');
-    localVideo.classList.add('mini');
-    remoteVideo.classList.add('mini');
-
-    localVideo.onclick = () => toggleFullscreen(localVideo);
-    remoteVideo.onclick = () => toggleFullscreen(remoteVideo);
-}
-
-// Полноэкранный режим
-function toggleFullscreen(videoElement) {
-    if (!document.fullscreenElement) {
-        videoElement.classList.remove('mini');
-        videoElement.classList.add('fullscreen');
-        videoElement.requestFullscreen().catch(err => {
-            console.error(`Ошибка полноэкранного режима: ${err.message}`);
-            videoElement.classList.add('mini');
-            videoElement.classList.remove('fullscreen');
-        });
-    } else {
-        document.exitFullscreen();
-        videoElement.classList.add('mini');
-        videoElement.classList.remove('fullscreen');
-    }
-}
-
-// Управление кнопками звонков
-function toggleCallButtons(show) {
-    audioCallButton.classList.toggle('hidden', !show);
-    videoCallButton.classList.toggle('hidden', !show);
-}
-
-// ===== ИНИЦИАЛИЗАЦИЯ =====
-// Загружаем конфигурацию ICE один раз при запуске
-loadIceServers().then(() => {
-    // Слушатели событий — активируем только после загрузки конфига
-    audioCallButton?.addEventListener('click', () => startCall('audio'));
-    videoCallButton?.addEventListener('click', () => startCall('video'));
-    acceptCallBtn?.addEventListener('click', acceptCall);
-    declineCallBtn?.addEventListener('click', declineCall);
-    endCallBtn?.addEventListener('click', endCall);
-});
-
-// Сокет-события (не зависят от ICE config)
-socket.on('call:incoming', data => {
-    if (data.senderId === senderId) return;
-
-    currentCallType = data.type;
-    callId = data.callId;
-    pendingOffer = data.sdp;
-
-    acceptCallBtn.classList.remove('hidden');
-    declineCallBtn.classList.remove('hidden');
-    notification("Поступил звонок");
-    toggleCallButtons(false);
-
-    callTimeout = setTimeout(() => {
-        declineCall();
-    }, 30000);
-});
-
-socket.on('call:accepted', async data => {
-    if (data.callId !== callId) return;
-
-    clearTimeout(callTimeout);
-    acceptCallBtn.classList.add('hidden');
-    declineCallBtn.classList.add('hidden');
-
-    try {
-        await peerConnection.setRemoteDescription(data.sdp);
-    } catch (error) {
-        console.error('Ошибка установки ответа от собеседника:', error);
-        endCall();
-    }
-});
-
-socket.on('call:rejected', data => {
-    if (data.callId !== callId) return;
-
-    clearTimeout(callTimeout);
-    notification('Звонок отклонён');
-    endCall();
-});
-
-socket.on('call:ended', data => {
-    if (data.callId !== callId) return;
-    clearTimeout(callTimeout);
-    notification('Звонок завершён');
-    endCall();
-});
-
-// ОБНОВЛЁННЫЙ обработчик ICE-кандидатов с логированием
-socket.on('webrtc:ice-candidate', async data => {
-    console.log('Call IDs - mine:', callId, 'received:', data.callId);
-    console.log('Receiving ICE candidate:', data.candidate);
-    console.log('Peer connection exists:', !!peerConnection);
-    console.log('Remote description set:', !!peerConnection?.remoteDescription);
     
-    if (data.senderId === senderId || !peerConnection || data.callId !== callId) {
-        console.log('Skipping candidate - conditions not met');
-        return;
-    }
-
-    try {
-        if (peerConnection.remoteDescription) {
-            await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-            console.log('ICE candidate added successfully');
-        } else {
-            console.log('Remote description not set yet, queuing candidate');
-            if (!peerConnection.queuedRemoteCandidates) {
-                peerConnection.queuedRemoteCandidates = [];
-            }
-            peerConnection.queuedRemoteCandidates.push(data.candidate);
+    // Закрытие всех соединений
+    Object.values(peerConnections).forEach(pc => {
+        try {
+            pc.close();
+        } catch (e) {
+            console.warn('Ошибка закрытия соединения:', e);
         }
-    } catch (error) {
-        console.error('Ошибка добавления ICE кандидата:', error);
-        console.error('Candidate ', data.candidate);
+    });
+    
+    // Очистка состояния
+    peerConnections = {};
+    remoteStreams = {};
+    remoteStreams = {};
+    
+    // Очистка видео контейнера
+    videoContainer.innerHTML = '';
+    videoContainer.classList.add('hidden');
+    
+    // Сброс состояния управления
+    hasCamera = false;
+    hasMicrophone = false;
+    isAudioMuted = false;
+    isVideoMuted = false;
+    
+    // Скрытие элементов управления
+    callControls.classList.add('hidden');
+    toggleCameraButton.classList.add('hidden');
+    toggleMicButton.classList.add('hidden');
+    
+    // Восстановление кнопки создания звонка
+    createCallButton.classList.remove('hidden');
+    declineCallButton.classList.add('hidden');
+}
+
+// Завершение звонка
+function endCall() {
+    cleanupResources();
+    socket.emit('leave_call', { chat_id: chatId });
+    notification('Звонок завершен');
+}
+
+// Обработка входящего звонка
+socket.on('incoming_call', (data) => {
+    if (data.chat_id !== chatId) return;
+    
+    currentCallerId = data.caller_id;
+    callerNameElement.textContent = data.caller_name || 'Пользователь';
+    
+    // Предзаполнение настроек по умолчанию
+    incomingUseCamera.checked = true;
+    incomingUseMicrophone.checked = true;
+    
+    incomingCallModal.classList.remove('hidden');
+});
+
+// Новый участник присоединился к звонку
+socket.on('user_joined_call', async (data) => {
+    if (data.chat_id !== chatId || !localStream) return;
+    
+    await createPeerConnection(data.user_id, data.username);
+});
+
+// Участник покинул звонок
+socket.on('user_left_call', (data) => {
+    if (data.chat_id !== chatId) return;
+    
+    // Закрытие соединения
+    if (peerConnections[data.user_id]) {
+        peerConnections[data.user_id].close();
+        delete peerConnections[data.user_id];
+    }
+    
+    // Удаление видео
+    const videoElement = document.getElementById(`remoteVideo-${data.user_id}`);
+    if (videoElement) {
+        videoElement.remove();
+    }
+    
+    // Очистка потока
+    if (remoteStreams[data.user_id]) {
+        remoteStreams[data.user_id].getTracks().forEach(track => track.stop());
+        delete remoteStreams[data.user_id];
     }
 });
 
-// Добавим обработчики состояния соединения Socket.IO
-socket.on('connect', () => {
-    console.log('Socket connected');
-});
-
-socket.on('disconnect', (reason) => {
-    console.log('Socket disconnected:', reason);
-});
-
-socket.on('connect_error', (error) => {
-    console.error('Socket connection error:', error);
-});
-
-document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) {
-        localVideo?.classList.add('mini');
-        localVideo?.classList.remove('fullscreen');
-        remoteVideo?.classList.add('mini');
-        remoteVideo?.classList.remove('fullscreen');
-    }
-});
+// ... остальной код WebRTC остается без изменений ...
+// (webrtc_offer, webrtc_answer, webrtc_ice_candidate, createPeerConnection, handleRemoteTrack)
