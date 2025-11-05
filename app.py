@@ -18,11 +18,12 @@ app = Flask(__name__)
 socketio = SocketIO(app, async_mode='eventlet')
 
 def generate_turn_credentials():
-    # Имя пользователя = текущее время (в секундах) + "1 час"
-    timestamp = int(time.time()) + 3600  # действует 1 час
-    username = str(timestamp)
+    # Время истечения креденциалов (в секундах)
+    expiration_time = int(time.time()) + 3600  # 1 час
     
-    # Пароль = HMAC-SHA1(secret, username)
+    # Генерируем пароль как HMAC(secret, username)
+    username = str(expiration_time)
+    
     password = hmac.new(
         TURN_SECRET.encode(),
         msg=username.encode(),
@@ -42,9 +43,13 @@ def turn_config():
         "iceServers": [
             {"urls": "stun:stun.l.google.com:19302"},
             {
-                "urls": [f"turn:live-message.falbue.ru:3478?transport=udp"],
+                "urls": [
+                    f"turn:{TURN_SERVER}:{TURN_PORT}?transport=udp",
+                    f"turn:{TURN_SERVER}:{TURN_PORT}?transport=tcp"
+                ],
                 "username": creds["username"],
-                "credential": creds["password"]
+                "credential": creds["password"],
+                "credentialType": "token"  # Важно: указываем тип токен
             }
         ]
     })
@@ -74,30 +79,24 @@ def handle_message(data):
         {'text': data['text'], 'sender_id': data['sender_id']},
         room=data['chat_id'])
 
-
 @socketio.on('call:request')
 def handle_call_request(data):
     chat_id = data['chatId']
-    # Передаём ВЕСЬ объект data, включая sdp (offer)
     socketio.emit('call:incoming', data, room=chat_id, skip_sid=request.sid)
 
 @socketio.on('call:response')
 def handle_call_response(data):
-    """Обработка ответа на звонок"""
     chat_id = data['chatId']
     if data['accepted']:
-        # Перенаправляем подтверждение отправителю
         socketio.emit('call:accepted', data, room=chat_id, skip_sid=request.sid)
     else:
         socketio.emit('call:rejected', data, room=chat_id, skip_sid=request.sid)
 
 @socketio.on('call:ended')
 def handle_call_end(data):
-    """Обработка завершения звонка"""
     chat_id = data['chatId']
     socketio.emit('call:ended', data, room=chat_id, skip_sid=request.sid)
 
-# WebRTC сигнализация
 @socketio.on('webrtc:offer')
 def handle_webrtc_offer(data):
     chat_id = data['chatId']
