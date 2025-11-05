@@ -129,14 +129,15 @@ button>i,
 	font-size: 1.2rem;
 }
 
-.input-message{
+.input-message {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
 }
 
 nav {
-	position: fixed;
+	position: absolute;
 	bottom: 110px;
 	z-index: 100;
 	display: flex;
@@ -150,7 +151,7 @@ nav {
 	border-radius: 12px;
 }
 
-nav>.buttons{
+nav > .buttons {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -168,7 +169,6 @@ textarea {
 	box-sizing: border-box;
 	min-height: 5vh;
 }
-
 textarea:focus {outline: none;}
 
 @media (max-width: 768px){
@@ -177,11 +177,7 @@ textarea:focus {outline: none;}
 		bottom: 20px;
 		font-size: 20px;
 	}
-	nav {
-		position: absolute !important;
-		bottom: auto; 
-		top: calc(var(--vh) - 140px);
-	}
+	nav {bottom: 100px !important;}
 	textarea {font-size: 1.2rem}
 }
 
