@@ -92,7 +92,7 @@ async function getMedia(video = false) {
         return true;
     } catch (error) {
         console.error('Ошибка получения медиа:', error);
-        alert('Не удалось получить доступ к микрофону/камере');
+        notification('Не удалось получить доступ к микрофону/камере');
         return false;
     }
 }
@@ -259,9 +259,9 @@ function endCall() {
         remoteStream = null;
     }
 
-    localVideo.srcObject = null;
-    remoteVideo.srcObject = null;
-    videoContainer.classList.add('hidden');
+    // localVideo.srcObject = null;
+    // remoteVideo.srcObject = null;
+    // videoContainer.classList.add('hidden');
 
     showButtons([audioCallButton]);
 
