@@ -11,8 +11,12 @@
 }
 
 
-html, body{background-color: var(--backgrond);}
-
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: var(--backgrond);
+}
 main{
 	height: var(--vh);
 	box-sizing: border-box;
@@ -66,37 +70,6 @@ button,
 button>i,
 .button>i{font-size: 1.2rem}
 
-.input-message{
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-}
-
-nav {
-	position: absolute;
-	z-index: 100;
-	display: flex;
-	align-items: flex-end;
-	justify-content: space-between;
-	width: 100%;
-	padding: 0 10px;
-	box-sizing: border-box;
-	margin-right: auto;
-}
-
-@media (max-width: 768px) {
-	nav{
-		inset: auto auto 100px auto;
-	}
-}
-
-nav>.buttons{
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 4px;
-}
-
 .notification {
 	position: fixed;
 	min-width: 250px;
@@ -146,6 +119,44 @@ nav>.buttons{
 	}
 }
 
+
+.chat {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	padding: 12px;
+	box-sizing: border-box;
+	font-size: 1.2rem;
+}
+
+.input-message{
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+nav {
+	position: fixed;
+	bottom: 110px;
+	z-index: 100;
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	width: 100%;
+	padding: 0 10px;
+	box-sizing: border-box;
+	margin-right: auto;
+	flex-direction: row-reverse;
+	border-radius: 12px;
+}
+
+nav>.buttons{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 4px;
+}
+
 textarea {
 	background-color: var(--input);
 	color: var(--text-color);
@@ -166,9 +177,13 @@ textarea:focus {outline: none;}
 		bottom: 20px;
 		font-size: 20px;
 	}
+	nav {
+		position: absolute !important;
+		bottom: auto; 
+		top: calc(var(--vh) - 140px);
+	}
 	textarea {font-size: 1.2rem}
 }
-
 
 code {
 	font-family: "Ubuntu Mono", monospace;
@@ -183,17 +198,6 @@ code {
 	width: 100%;
 	padding: 2px 6px;
 	box-sizing: border-box;
-}
-
-.chat {
-    flex: 1;
-    padding: 12px;
-    font-size: 1.2rem;
-    min-height: 0;
-    overflow-y: auto;
-    max-height: 100%;
-    cursor: text;
-
 }
 
 

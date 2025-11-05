@@ -12,8 +12,17 @@ function formatMessage(message) {
     };
     let escapedMessage = escapeHtml(message);
 
-    const codeBlockPattern = /```([\s\S]*?)```/g;
-    escapedMessage = escapedMessage.replace(codeBlockPattern, '<pre class="block-code" ><code>$1</code></pre>');
+    // Поддержка блоков кода с языком: ```js или ```python и т.д.
+    const codeBlockPattern = /```(\w+)?\n?([\s\S]*?)\n?```/g;
+
+    escapedMessage = escapedMessage.replace(
+        codeBlockPattern,
+        (match, language, code) => {
+            const langClass = language ? `language-${language}` : 'language-plain';
+            return `<pre class="block-code"><code class="${langClass}">${escapeHtml(code.trim())}</code></pre>`;
+        }
+    );
+
     return escapedMessage.replace(/\n/g, '<br>');
 }
 
@@ -27,6 +36,7 @@ inputMessage.addEventListener('input', () => {
 socket.on('receive_message', (data) => {
     if (data.sender_id !== senderId) {
         displayMessage.innerHTML = formatMessage(data.text);
+        // Prism.highlightAll();
     }
 });
 
