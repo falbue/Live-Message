@@ -63,6 +63,19 @@ function initPeerConnection(isInitiator) {
         if (peerConnection.iceConnectionState === 'failed' || 
             peerConnection.iceConnectionState === 'disconnected') {
             console.error('ICE connection failed:', peerConnection.iceConnectionState);
+            // Попробовать пересоздать соединение
+            setTimeout(() => {
+                if (callId && peerConnection.iceConnectionState !== 'connected') {
+                    console.log('Recreating connection...');
+                    endCall();
+                     // Попробовать перезвонить через 2 секунды
+                     setTimeout(() => {
+                         if (currentCallType) {
+                             startCall(currentCallType);
+                         }
+                     }, 2000);
+                }
+            }, 1000);
         }
         if (peerConnection.iceConnectionState === 'connected' || 
             peerConnection.iceConnectionState === 'completed') {
@@ -74,10 +87,14 @@ function initPeerConnection(isInitiator) {
         console.log('Connection State:', peerConnection.connectionState);
     };
 
+    peerConnection.onicegatheringstatechange = () => {
+        console.log('ICE Gathering State:', peerConnection.iceGatheringState);
+    };
+
     peerConnection.onicecandidate = event => {
         if (event.candidate) {
             console.log('Sending ICE candidate:', event.candidate);
-            console.log('Socket connected:', socket.connected); // Проверяем соединение
+            console.log('Candidate type:', event.candidate.type); // relay, host, srflx
             socket.emit('webrtc:ice-candidate', {
                 chatId,
                 senderId,
@@ -86,6 +103,12 @@ function initPeerConnection(isInitiator) {
             });
         } else {
             console.log('ICE gathering completed');
+            // После завершения сбора кандидатов, проверяем состояние
+            setTimeout(() => {
+                if (peerConnection.iceConnectionState === 'checking') {
+                    console.log('Still checking after gathering completed...');
+                }
+            }, 1000);
         }
     };
 
@@ -191,6 +214,20 @@ async function acceptCall() {
 
     try {
         await peerConnection.setRemoteDescription(pendingOffer);
+
+        // Обработка отложенных кандидатов
+        if (peerConnection.queuedRemoteCandidates) {
+            console.log('Processing queued candidates:', peerConnection.queuedRemoteCandidates.length);
+            for (const candidate of peerConnection.queuedRemoteCandidates) {
+                try {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                    console.log('Queued candidate added');
+                } catch (e) {
+                    console.error('Ошибка добавления отложенного кандидата:', e);
+                }
+            }
+            peerConnection.queuedRemoteCandidates = [];
+        }
 
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
@@ -373,15 +410,28 @@ socket.on('call:ended', data => {
 socket.on('webrtc:ice-candidate', async data => {
     console.log('Call IDs - mine:', callId, 'received:', data.callId);
     console.log('Receiving ICE candidate:', data.candidate);
-    console.log('Current connection state:', peerConnection?.connectionState);
+    console.log('Peer connection exists:', !!peerConnection);
+    console.log('Remote description set:', !!peerConnection?.remoteDescription);
     
-    if (data.senderId === senderId || !peerConnection || data.callId !== callId) return;
+    if (data.senderId === senderId || !peerConnection || data.callId !== callId) {
+        console.log('Skipping candidate - conditions not met');
+        return;
+    }
 
     try {
-        await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-        console.log('ICE candidate added successfully');
+        if (peerConnection.remoteDescription) {
+            await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            console.log('ICE candidate added successfully');
+        } else {
+            console.log('Remote description not set yet, queuing candidate');
+            if (!peerConnection.queuedRemoteCandidates) {
+                peerConnection.queuedRemoteCandidates = [];
+            }
+            peerConnection.queuedRemoteCandidates.push(data.candidate);
+        }
     } catch (error) {
         console.error('Ошибка добавления ICE кандидата:', error);
+        console.error('Candidate ', data.candidate);
     }
 });
 
