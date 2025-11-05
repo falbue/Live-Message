@@ -29,12 +29,13 @@ async function loadIceServers() {
         const res = await fetch('/turn-config');
         if (!res.ok) throw new Error('Failed to load TURN config');
         const config = await res.json();
-        iceServers = config;
+        iceServers = config.iceServers; // Только массив серверов
+        console.log('ICE Servers loaded:', iceServers);
     } catch (err) {
-        console.warn('Не удалось загрузить TURN-конфигурацию, используем STUN-только:', err);
-        iceServers = {
-            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-        };
+        console.warn('Не удалось загрузить TURN-конфигурацию:', err);
+        iceServers = [
+            { urls: 'stun:stun.l.google.com:19302' }
+        ];
     }
 }
 
