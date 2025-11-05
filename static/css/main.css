@@ -186,36 +186,11 @@ code {
 .chat{
 	padding: 12px;
 	font-size: 1.2rem;
-	c
 }
 
 
-
-.call-notification {
-	position: fixed;
-	bottom: 20px;
-	left: 50%;
-	transform: translateX(-50%);
-	background: var(--backgrond);
-	padding: 15px 25px;
-	border-radius: 12px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-	z-index: 1000;
-	text-align: center;
-	color: white;
-	font-weight: 500;
-}
-
-.call-actions {
-	display: flex;
-	justify-content: center;
-	gap: 20px;
-	margin-top: 10px;
-}
-
-.call-btn.accept { background: #4CAF50; color: white; }
-.call-btn.decline { background: #F44336; color: white; }
-.end {background: #F44336; }
+.accept { background: var(--green); color: var(--text-color); }
+.decline { background: var(--red); color: var(--text-color); }
 
 #videoContainer {
 	display: flex;
