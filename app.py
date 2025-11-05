@@ -30,7 +30,6 @@ def handle_message(data):
         {'text': data['text'], 'sender_id': data['sender_id']},
         room=data['chat_id'])
 
-
 @socketio.on('call:request')
 def handle_call_request(data):
     chat_id = data['chatId']
@@ -46,16 +45,6 @@ def handle_call_response(data):
         socketio.emit('call:rejected', data, room=chat_id, skip_sid=request.sid)
 
 # WebRTC сигнализация
-@socketio.on('webrtc:offer')
-def handle_webrtc_offer(data):
-    chat_id = data['chatId']
-    socketio.emit('webrtc:offer', data, room=chat_id, skip_sid=request.sid)
-
-@socketio.on('webrtc:answer')
-def handle_webrtc_answer(data):
-    chat_id = data['chatId']
-    socketio.emit('webrtc:answer', data, room=chat_id, skip_sid=request.sid)
-
 @socketio.on('webrtc:ice-candidate')
 def handle_ice_candidate(data):
     chat_id = data['chatId']
