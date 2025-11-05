@@ -20,16 +20,32 @@ let callTimeout = null;
 let callId = null;
 let pendingOffer = null;
 
-// Конфигурация WebRTC
-const iceServers = {
-    iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        // В продакшене добавьте TURN-серверы
-    ]
-};
+// ⚠️ REMOVED STATIC iceServers — now loaded dynamically
+let iceServers = null;
+
+// Загружаем TURN-конфигурацию при старте
+async function loadIceServers() {
+    try {
+        const res = await fetch('/turn-config');
+        if (!res.ok) throw new Error('Failed to load TURN config');
+        const config = await res.json();
+        iceServers = config;
+        console.log('ICE серверы загружены:', iceServers);
+    } catch (err) {
+        console.warn('Не удалось загрузить TURN-конфигурацию, используем STUN-только:', err);
+        iceServers = {
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        };
+    }
+}
 
 // Инициализация PeerConnection
 function initPeerConnection(isInitiator) {
+    if (!iceServers) {
+        console.error('ICE серверы не загружены!');
+        alert('Ошибка инициализации WebRTC');
+        return;
+    }
     peerConnection = new RTCPeerConnection(iceServers);
 
     peerConnection.onicecandidate = event => {
@@ -143,14 +159,11 @@ async function acceptCall() {
     initPeerConnection(false);
 
     try {
-        // Устанавливаем remote description (offer от вызывающего)
         await peerConnection.setRemoteDescription(pendingOffer);
 
-        // Создаём answer
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
 
-        // Отправляем ответ
         socket.emit('call:response', {
             chatId,
             senderId,
@@ -218,8 +231,9 @@ function endCall() {
     pendingOffer = null;
     isCaller = false;
 
+    // Отправка события завершения — только если callId существует
     if (callId) {
-        socket.emit('call:ended', {
+        socket.emit('call:end', {
             chatId,
             senderId,
             callId
@@ -265,22 +279,25 @@ function toggleCallButtons(show) {
     videoCallButton.classList.toggle('hidden', !show);
 }
 
-// Слушатели событий
-audioCallButton?.addEventListener('click', () => startCall('audio'));
-videoCallButton?.addEventListener('click', () => startCall('video'));
-acceptCallBtn?.addEventListener('click', acceptCall);
-declineCallBtn?.addEventListener('click', declineCall);
-endCallBtn?.addEventListener('click', declineCall);
+// ===== ИНИЦИАЛИЗАЦИЯ =====
+// Загружаем конфигурацию ICE один раз при запуске
+loadIceServers().then(() => {
+    // Слушатели событий — активируем только после загрузки конфига
+    audioCallButton?.addEventListener('click', () => startCall('audio'));
+    videoCallButton?.addEventListener('click', () => startCall('video'));
+    acceptCallBtn?.addEventListener('click', acceptCall);
+    declineCallBtn?.addEventListener('click', declineCall);
+    endCallBtn?.addEventListener('click', endCall);
+});
 
-// Сокет-события
+// Сокет-события (не зависят от ICE config)
 socket.on('call:incoming', data => {
     if (data.senderId === senderId) return;
 
     currentCallType = data.type;
     callId = data.callId;
-    pendingOffer = data.sdp; // сохраняем offer (объект {type, sdp})
+    pendingOffer = data.sdp;
 
-    // callTypeDisplay.textContent = data.type === 'video' ? 'видео' : 'аудио';
     acceptCallBtn.classList.remove('hidden');
     declineCallBtn.classList.remove('hidden');
     notification("Поступил звонок");
@@ -315,11 +332,9 @@ socket.on('call:rejected', data => {
 });
 
 socket.on('call:ended', data => {
-    console.log("раб1")
     if (data.callId !== callId) return;
-    console.log("раб2")
     clearTimeout(callTimeout);
-    notification('Звонок отклонён');
+    notification('Звонок завершён');
     endCall();
 });
 
@@ -333,7 +348,6 @@ socket.on('webrtc:ice-candidate', async data => {
     }
 });
 
-// Обработка выхода из полноэкранного режима
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
         localVideo?.classList.add('mini');

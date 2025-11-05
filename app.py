@@ -1,9 +1,53 @@
 import uuid
 from flask import Flask, render_template, send_from_directory, request
 from flask_socketio import SocketIO, join_room, leave_room, disconnect
+import time
+import hmac
+import hashlib
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+TURN_SECRET = os.getenv("TURN_SECRET")
+TURN_REALM = os.getenv("TURN_REALM")
+TURN_SERVER = os.getenv("TURN_SERVER")
+TURN_PORT = int(os.getenv("TURN_PORT"))
 
 app = Flask(__name__)
 socketio = SocketIO(app, async_mode='eventlet')
+
+def generate_turn_credentials():
+    # Имя пользователя = текущее время (в секундах) + "1 час"
+    timestamp = int(time.time()) + 3600  # действует 1 час
+    username = str(timestamp)
+    
+    # Пароль = HMAC-SHA1(secret, username)
+    password = hmac.new(
+        TURN_SECRET.encode(),
+        msg=username.encode(),
+        digestmod=hashlib.sha1
+    ).hexdigest()
+
+    return {
+        "username": username,
+        "password": password,
+        "ttl": 3600
+    }
+
+@app.route('/turn-config')
+def turn_config():
+    creds = generate_turn_credentials()
+    return jsonify({
+        "iceServers": [
+            {"urls": "stun:stun.l.google.com:19302"},
+            {
+                "urls": [f"turn:{TURN_SERVER}:{TURN_PORT}", f"turn:{TURN_SERVER}:5349?transport=tcp"],
+                "username": creds["username"],
+                "credential": creds["password"]
+            }
+        ]
+    })
 
 @app.route('/')
 def index():
