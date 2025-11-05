@@ -42,7 +42,7 @@ def turn_config():
         "iceServers": [
             {"urls": "stun:stun.l.google.com:19302"},
             {
-                "urls": [f"turn:{TURN_SERVER}:{TURN_PORT}", f"turn:{TURN_SERVER}:5349?transport=tcp"],
+                "urls": [f"turn:live-message.falbue.ru:3478?transport=udp"],
                 "username": creds["username"],
                 "credential": creds["password"]
             }
