@@ -1,8 +1,8 @@
 const audioCallButton = document.getElementById('audioCallButton');
 const videoCallButton = document.getElementById('videoCallButton');
+const muteButton = document.getElementById('muteButton');
 const acceptCallBtn = document.getElementById('acceptCall');
 const declineCallBtn = document.getElementById('declineCall');
-const callTypeDisplay = document.getElementById('callType');
 const videoContainer = document.getElementById('videoContainer');
 const localVideo = document.getElementById('localVideo');
 const remoteVideo = document.getElementById('remoteVideo');
@@ -12,16 +12,17 @@ let localStream = null;
 let remoteStream = null;
 let peerConnection = null;
 let isCaller = false;
-let currentCallType = null;
+let callType = 'audio';
 let callTimeout = null;
 let callId = null;
 let pendingOffer = null;
+let isVideoEnabled = false;
+let isMuted = false;
 
 // КОНФИГУРАЦИЯ WEBRTC
 const iceServers = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
-        // В продакшене добавьте TURN-серверы
     ]
 };
 
@@ -41,11 +42,13 @@ function initPeerConnection(isInitiator) {
     };
 
     peerConnection.ontrack = event => {
-        if (!remoteStream) {
-            remoteStream = new MediaStream();
-            remoteVideo.srcObject = remoteStream;
+        const stream = event.streams[0];
+        if (event.track.kind === 'video') {
+            remoteVideo.srcObject = stream;
+            videoContainer.classList.remove('hidden');
+        } else if (event.track.kind === 'audio') {
+            remoteVideo.srcObject = stream;
         }
-        remoteStream.addTrack(event.track);
     };
 
     if (localStream) {
@@ -56,18 +59,37 @@ function initPeerConnection(isInitiator) {
 }
 
 // УПРАВЛЕНИЕ МЕДИАПОТОКОМ
-async function getMedia(type) {
+async function getMedia(video = false) {
     try {
         const constraints = {
             audio: true,
-            video: type === 'video' ? { width: 320, height: 240 } : false
+            video: video ? { width: 320, height: 240 } : false
         };
 
-        localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+        }
+
+        localStream = newStream;
 
         if (localVideo) {
             localVideo.srcObject = localStream;
         }
+
+        if (peerConnection) {
+            const localTracks = peerConnection.getSenders();
+            localTracks.forEach(sender => {
+                if (sender.track) {
+                    if (sender.track.kind === 'video' && newStream.getVideoTracks()[0]) {
+                        sender.replaceTrack(newStream.getVideoTracks()[0]);
+                    }
+                }
+            });
+        }
+
+        muteButton.classList.remove('hidden');
 
         return true;
     } catch (error) {
@@ -77,16 +99,18 @@ async function getMedia(type) {
     }
 }
 
-// УПРАВЛЕНИЕ ЗВОНКАМИ
-async function startCall(type) {
-    if (!await getMedia(type)) return;
+// НАЧАЛО АУДИОЗВОНКА
+async function startCall() {
+    if (!await getMedia(false)) return;
 
     isCaller = true;
-    currentCallType = type;
+    callType = 'audio';
     callId = Date.now().toString(36) + Math.random().toString(36).substr(2);
-    
+
     declineCallBtn.classList.remove('hidden');
-    toggleCallButtons(false);
+    audioCallButton.classList.add('hidden');
+    videoCallButton.classList.remove('hidden');
+    muteButton.classList.remove('hidden');
     initPeerConnection(true);
 
     try {
@@ -97,7 +121,7 @@ async function startCall(type) {
             chatId,
             senderId,
             callId,
-            type,
+            type: 'audio',
             sdp: offer
         });
 
@@ -107,13 +131,54 @@ async function startCall(type) {
                 notification('Звонок не был принят');
             }
         }, 30000);
-
-        if (type === 'video') {
-            setupVideoContainer(true);
-        }
     } catch (error) {
         console.error('Ошибка создания offer:', error);
         endCall();
+    }
+}
+
+// ПЕРЕКЛЮЧЕНИЕ ВИДЕО (вкл/выкл)
+async function toggleVideo() {
+    if (!isVideoEnabled) {
+        if (!await getMedia(true)) return;
+        isVideoEnabled = true;
+        videoCallButton.classList.add('active');
+        localVideo.classList.remove('hidden');
+        videoContainer.classList.remove('hidden');
+    } else {
+        if (localStream) {
+            const videoTrack = localStream.getVideoTracks()[0];
+            if (videoTrack) {
+                videoTrack.stop();
+            }
+            const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+            if (videoSender) {
+                peerConnection.removeTrack(videoSender);
+            }
+        }
+        isVideoEnabled = false;
+        videoCallButton.classList.remove('active');
+        localVideo.classList.add('hidden');
+        if (!remoteVideo.srcObject) {
+            videoContainer.classList.add('hidden');
+        }
+    }
+}
+
+// ПЕРЕКЛЮЧЕНИЕ МИКРОФОНА (mute/unmute)
+function toggleMute() {
+    if (!localStream) return;
+
+    localStream.getAudioTracks().forEach(track => {
+        track.enabled = !track.enabled;
+    });
+
+    isMuted = !isMuted;
+    muteButton.classList.toggle('muted', isMuted);
+    if (isMuted) {
+        muteButton.innerHTML = '<i class="iconoir-microphone-mute-solid"></i>';
+    } else {
+        muteButton.innerHTML = '<i class="iconoir-microphone"></i>';
     }
 }
 
@@ -126,12 +191,14 @@ async function acceptCall() {
         return;
     }
 
-    if (!await getMedia(currentCallType)) {
+    if (!await getMedia(false)) {
         declineCall();
         return;
     }
-    
+
     acceptCallBtn.classList.add('hidden');
+    videoCallButton.classList.remove('hidden');
+    muteButton.classList.remove('hidden');
 
     initPeerConnection(false);
 
@@ -149,16 +216,13 @@ async function acceptCall() {
             sdp: answer
         });
 
-        if (currentCallType === 'video') {
-            setupVideoContainer(true);
-        }
-
         pendingOffer = null;
     } catch (error) {
         console.error('Ошибка при принятии звонка:', error);
         declineCall();
     }
 }
+
 
 function declineCall() {
     clearTimeout(callTimeout);
@@ -199,11 +263,14 @@ function endCall() {
     acceptCallBtn.classList.add('hidden');
     declineCallBtn.classList.add('hidden');
     toggleCallButtons(true);
+    muteButton.classList.add('hidden');
 
     clearTimeout(callTimeout);
     callId = null;
     pendingOffer = null;
     isCaller = false;
+    isVideoEnabled = false;
+    isMuted = false;
 
     if (callId) {
         socket.emit('call:ended', {
@@ -214,56 +281,23 @@ function endCall() {
     }
 }
 
-
-// УПРАВЛЕНИЕ ВИДЕО ИНТЕРФЕЙСОМ
-function setupVideoContainer(show) {
-    if (!show) {
-        videoContainer.classList.add('hidden');
-        return;
-    }
-
-    videoContainer.classList.remove('hidden');
-    localVideo.classList.add('mini');
-    remoteVideo.classList.add('mini');
-
-    localVideo.onclick = () => toggleFullscreen(localVideo);
-    remoteVideo.onclick = () => toggleFullscreen(remoteVideo);
-}
-
-function toggleFullscreen(videoElement) {
-    if (!document.fullscreenElement) {
-        videoElement.classList.remove('mini');
-        videoElement.classList.add('fullscreen');
-        videoElement.requestFullscreen().catch(err => {
-            console.error(`Ошибка полноэкранного режима: ${err.message}`);
-            videoElement.classList.add('mini');
-            videoElement.classList.remove('fullscreen');
-        });
-    } else {
-        document.exitFullscreen();
-        videoElement.classList.add('mini');
-        videoElement.classList.remove('fullscreen');
-    }
-}
-
 function toggleCallButtons(show) {
     audioCallButton.classList.toggle('hidden', !show);
-    videoCallButton.classList.toggle('hidden', !show);
+    videoCallButton.classList.toggle('hidden', show);
 }
 
-
 // ОБРАБОТКА СОБЫТИЙ ПОЛЬЗОВАТЕЛЯ
-audioCallButton?.addEventListener('click', () => startCall('audio'));
-videoCallButton?.addEventListener('click', () => startCall('video'));
+audioCallButton?.addEventListener('click', startCall);
+videoCallButton?.addEventListener('click', toggleVideo);
+muteButton?.addEventListener('click', toggleMute);
 acceptCallBtn?.addEventListener('click', acceptCall);
 declineCallBtn?.addEventListener('click', declineCall);
-
 
 // ОБРАБОТКА СОКЕТ-СОБЫТИЙ
 socket.on('call:incoming', data => {
     if (data.senderId === senderId) return;
 
-    currentCallType = data.type;
+    callType = data.type;
     callId = data.callId;
     pendingOffer = data.sdp;
 
@@ -306,16 +340,5 @@ socket.on('webrtc:ice-candidate', async data => {
         await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
     } catch (error) {
         console.error('Ошибка добавления ICE кандидата:', error);
-    }
-});
-
-
-// ОБРАБОТКА СИСТЕМНЫХ СОБЫТИЙ
-document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) {
-        localVideo?.classList.add('mini');
-        localVideo?.classList.remove('fullscreen');
-        remoteVideo?.classList.add('mini');
-        remoteVideo?.classList.remove('fullscreen');
     }
 });
