@@ -133,22 +133,20 @@ button>i,
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
 }
 
 nav {
-	position: absolute;
-	bottom: 110px;
 	z-index: 100;
 	display: flex;
 	align-items: flex-end;
 	justify-content: space-between;
 	width: 100%;
-	padding: 0 10px;
+	padding: 6px 10px;
 	box-sizing: border-box;
 	margin-right: auto;
 	flex-direction: row-reverse;
-	border-radius: 12px;
+	background-color: var(--black);
+	border-radius: 12px 12px 0 0;
 }
 
 nav > .buttons {
@@ -158,16 +156,45 @@ nav > .buttons {
 	gap: 4px;
 }
 
+.textarea-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.resize-handle {
+    height: 6px;
+    background: var(--gray);
+    cursor: ns-resize;
+    margin-bottom: -3px;
+    z-index: 5;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+
+}
+.resize-handle>i{}
+@media (max-width: 768px){
+	.resize-handle {height: 10px;}
+}
+
 textarea {
-	background-color: var(--input);
-	color: var(--text-color);
-	font-size: 24px;
-	padding: 20px 20px 20px 20px;
-	width: 100%;
-	border: none;
-	resize: none;
-	box-sizing: border-box;
-	min-height: 5vh;
+    background-color: var(--input);
+    color: var(--text-color);
+    font-size: 1.4rem;
+    padding: 20px;
+    width: 100%;
+    border: none;
+    box-sizing: border-box;
+    min-height: 1.2em;
+    /*max-height: calc(1.2em * 11);*/
+    max-height: 40dvh;
+    line-height: 1.2em;
+    resize: none;
+    overflow-y: auto;
 }
 textarea:focus {outline: none;}
 
@@ -175,7 +202,7 @@ textarea:focus {outline: none;}
 	textarea::placeholder {
 		position: absolute;
 		bottom: 20px;
-		font-size: 20px;
+		font-size: 1.4rem;
 	}
 	nav {bottom: 100px !important;}
 	textarea {font-size: 1.2rem}
