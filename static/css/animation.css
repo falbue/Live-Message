@@ -1,51 +1,56 @@
 button,
 .button {
-  transition: transform 300ms ease, box-shadow 300ms ease;
+    transition:
+        transform 300ms ease,
+        box-shadow 300ms ease;
 }
 
 button,
 .button:hover {
-  transform: scale(1.01);
-  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.01);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 button,
 .button:active {
-  transform: scale(0.98);
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0);
+    transform: scale(0.98);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0);
 }
 
-
 .call::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 12px;
-  padding: 2px; /* толщина обводки */
-  background: linear-gradient(45deg, #ff8a00, #e52e71, #22c1c3);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: destination-out;
-  mask-composite: exclude;
-  opacity: 1;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    padding: 2px; /* толщина обводки */
+    background: linear-gradient(45deg, #ff8a00, #e52e71, #22c1c3);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
 /* Опционально: анимация вращения градиента */
 @keyframes rotate-border {
-  0% {
-    background: linear-gradient(0deg, #ff8a00, #e52e71, #22c1c3);
-  }
-  100% {
-    background: linear-gradient(360deg, #ff8a00, #e52e71, #22c1c3);
-  }
+    0% {
+        background: linear-gradient(0deg, #ff8a00, #e52e71, #22c1c3);
+    }
+    100% {
+        background: linear-gradient(360deg, #ff8a00, #e52e71, #22c1c3);
+    }
 }
 
 .call.animated-border::before {
-  animation: rotate-border 2s linear infinite;
-  opacity: 1;
+    animation: rotate-border 2s linear infinite;
+    opacity: 1;
 }

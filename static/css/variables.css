@@ -1,41 +1,40 @@
 :root {
-  --ligth: #CDBCE2;
-  --ligth2: #AF99CC;
-  --dark: #1A1A36;
-  --dark2: #2E2661;
-  --black: #1A1A1A;
-  --white: #E8D7FF;
-  --red: #F44336;
-  --green: #4CAF50;
+    --ligth: #cdbce2;
+    --ligth2: #af99cc;
+    --dark: #1a1a36;
+    --dark2: #2e2661;
+    --black: #1a1a1a;
+    --white: #e8d7ff;
+    --red: #f44336;
+    --green: #4caf50;
 
-  --vh: 100dvh;
+    --vh: 100dvh;
 }
 
-
 @media (prefers-color-scheme: light) {
-  :root {
-    --bg-color: var(--black);
-    --text-color: var(--black);
-    --button: var(--ligth2);
-    --backgrond: var(--ligth);
-    --input: var(--white);
-  }
+    :root {
+        --bg-color: var(--black);
+        --text-color: var(--black);
+        --button: var(--ligth2);
+        --backgrond: var(--ligth);
+        --input: var(--white);
+    }
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --text-color: var(--white);
-    --bg-color: var(--white);
-    --button: var(--dark2);
-    --backgrond: var(--dark);
-    --input: var(--black);
-  }
+    :root {
+        --text-color: var(--white);
+        --bg-color: var(--white);
+        --button: var(--dark2);
+        --backgrond: var(--dark);
+        --input: var(--black);
+    }
 }
 
-.center{
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hidden {
@@ -47,15 +46,19 @@
     pointer-events: none !important;
 }
 .hidden * {
-  visibility: hidden !important;
-  width: 0;
-  height: 0;
+    visibility: hidden !important;
+    width: 0;
+    height: 0;
 }
 
-#videoCallButton{display: none}
-#videoContainer{display: none}
+#videoCallButton {
+    display: none;
+}
+#videoContainer {
+    display: none;
+}
 
-.show{
-  visibility: visible !important;
-  opacity: 1 !important;
+.show {
+    visibility: visible !important;
+    opacity: 1 !important;
 }

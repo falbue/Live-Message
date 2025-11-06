@@ -1,228 +1,254 @@
 @import url("animation.css");
 @import url("variables.css");
 
-
-*{
-	padding: 0;
-	margin: 0;
-	font-family: "Montserrat", sans-serif;
-	font-optical-sizing: auto;
-	font-style: normal;
+* {
+    padding: 0;
+    margin: 0;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
 }
 
-
-html, body {
-	height: 100%;
-	margin: 0;
-	padding: 0;
-	background-color: var(--backgrond);
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--backgrond);
 }
-main{
-	height: var(--vh);
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
+main {
+    height: var(--vh);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-a{text-decoration: none;}
+a {
+    text-decoration: none;
+}
 
-h1 {font-size: 4rem;}
-h2 {font-size: 2rem;}
-h3 {font-size: 1.5rem;}
+h1 {
+    font-size: 4rem;
+}
+h2 {
+    font-size: 2rem;
+}
+h3 {
+    font-size: 1.5rem;
+}
 
 @media (max-width: 768px) {
-	h1 {font-size: clamp(2rem, 6vw, 3rem);}
-	h2 {font-size: clamp(1.125rem, 4vw, 1.125rem);}
-	h3 {font-size: clamp(1.125rem, 4.5vw, 1.25rem);}
+    h1 {
+        font-size: clamp(2rem, 6vw, 3rem);
+    }
+    h2 {
+        font-size: clamp(1.125rem, 4vw, 1.125rem);
+    }
+    h3 {
+        font-size: clamp(1.125rem, 4.5vw, 1.25rem);
+    }
 }
 
-h1, h2, h3, p {color: var(--text-color);}
+h1,
+h2,
+h3,
+p {
+    color: var(--text-color);
+}
 
-
-section{
-	display: flex;
-	flex-direction: column;
-	margin-left: auto;
-	margin-right: auto;
-	width: 90%;
-	min-height: 100%;
+section {
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    min-height: 100%;
 }
 
 button,
-.button{
-	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-	font-weight: bold;
-	text-align: center;
-	border-radius: 12px;
-	padding: 12px;
-	background-color: var(--button);
-	color: var(--text-color);
-	box-shadow: 0px 6px 4px 0px rgba(0, 0, 0, 0.25);
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	border: none;
-	cursor: pointer;
+.button {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    font-weight: bold;
+    text-align: center;
+    border-radius: 12px;
+    padding: 12px;
+    background-color: var(--button);
+    color: var(--text-color);
+    box-shadow: 0px 6px 4px 0px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
 }
 
-button>i,
-.button>i{font-size: 1.2rem}
+button > i,
+.button > i {
+    font-size: 1.2rem;
+}
 
 .notification {
-	position: fixed;
-	min-width: 250px;
-	inset: 20px auto auto 50%;
-	transform: translateX(-50%);
-	background-color: var(--button);
-	color: var(--adptive-text);
-	padding: 10px 20px;
-	border-radius: 12px;
-	z-index: 9999;
-	opacity: 0;
-	visibility: hidden;
-	transition: opacity 0.5s, visibility 0.5s;
-	font-size: 1.2rem;
-	text-align: center;
-	color: var(--text-color);
-	border: 1px solid var(--text-color);
+    position: fixed;
+    min-width: 250px;
+    inset: 20px auto auto 50%;
+    transform: translateX(-50%);
+    background-color: var(--button);
+    color: var(--adptive-text);
+    padding: 10px 20px;
+    border-radius: 12px;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.5s,
+        visibility 0.5s;
+    font-size: 1.2rem;
+    text-align: center;
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
 }
 
-@media (max-width: 768px) {
-	.notification {
-	}
-
-}
-
-.hero{
-	display: flex;
-	flex-direction: column;
-	margin-right: auto;
-	justify-content: space-between;
-	min-height: 400px;
-	padding: 20px 0;
-	box-sizing: border-box;
+.hero {
+    display: flex;
+    flex-direction: column;
+    margin-right: auto;
+    justify-content: space-between;
+    min-height: 400px;
+    padding: 20px 0;
+    box-sizing: border-box;
 }
 .hero::before {
-	content: '';
-	flex: 0 0 auto;
-	visibility: hidden
+    content: "";
+    flex: 0 0 auto;
+    visibility: hidden;
 }
 
 @media (max-width: 768px) {
-	.hero{
-		height: 95vh;
-		margin-right: 0;
-		width: 100%;
-		text-align: center;
-	}
+    .hero {
+        height: 95vh;
+        margin-right: 0;
+        width: 100%;
+        text-align: center;
+    }
 }
 
-
 .chat {
-	flex: 1;
-	min-height: 0;
-	overflow-y: auto;
-	padding: 12px;
-	box-sizing: border-box;
-	font-size: 1.2rem;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 12px;
+    box-sizing: border-box;
+    font-size: 1.2rem;
 }
 
 .input-message {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	background-color: var(--input);
-	border-radius: 12px 12px 0 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--input);
+    border-radius: 12px 12px 0 0;
 }
 
 nav {
-	z-index: 100;
-	display: flex;
-	align-items: flex-end;
-	justify-content: space-between;
-	width: 100%;
-	padding: 6px 10px;
-	box-sizing: border-box;
-	margin-right: auto;
-	flex-direction: row-reverse;
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 100%;
+    padding: 6px 10px;
+    box-sizing: border-box;
+    margin-right: auto;
+    flex-direction: row-reverse;
 }
 
 nav > .buttons {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
 }
 
 .textarea-wrapper {
-	position: relative;
-	width: 100%;
-	display: flex;
-	flex-direction: column;
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .resize-handle {
-	height: 6px;
-	background: rgba(0, 0, 0, 0.1);
-	cursor: ns-resize;
-	margin-bottom: -3px;
-	z-index: 5;
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: var(--text-color);
-
+    height: 6px;
+    background: rgba(0, 0, 0, 0.1);
+    cursor: ns-resize;
+    margin-bottom: -3px;
+    z-index: 5;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
 }
-.resize-handle>i{}
-@media (max-width: 768px){
-	.resize-handle {height: 10px;}
+
+@media (max-width: 768px) {
+    .resize-handle {
+        height: 10px;
+    }
 }
 
 textarea {
-	background-color: var(--input);
-	color: var(--text-color);
-	font-size: 1.4rem;
-	padding: 20px;
-	width: 100%;
-	border: none;
-	box-sizing: border-box;
-	min-height: 1.2em;
-	/*max-height: calc(1.2em * 11);*/
-	max-height: 40dvh;
-	line-height: 1.2em;
-	resize: none;
-	overflow-y: auto;
+    background-color: var(--input);
+    color: var(--text-color);
+    font-size: 1.4rem;
+    padding: 20px;
+    width: 100%;
+    border: none;
+    box-sizing: border-box;
+    min-height: 1.2em;
+    /*max-height: calc(1.2em * 11);*/
+    max-height: 40dvh;
+    line-height: 1.2em;
+    resize: none;
+    overflow-y: auto;
 }
-textarea:focus {outline: none;}
+textarea:focus {
+    outline: none;
+}
 
-@media (max-width: 768px){
-	textarea::placeholder {
-		position: absolute;
-		bottom: 20px;
-		font-size: 1.4rem;
-	}
-	nav {bottom: 100px !important;}
-	textarea {font-size: 1.2rem}
+@media (max-width: 768px) {
+    textarea::placeholder {
+        position: absolute;
+        bottom: 20px;
+        font-size: 1.4rem;
+    }
+    nav {
+        bottom: 100px !important;
+    }
+    textarea {
+        font-size: 1.2rem;
+    }
 }
 
 code {
-	font-family: "Ubuntu Mono", monospace;
-	font-style: normal;
-	font-size: 0.8rem;
-	color: white;
+    font-family: "Ubuntu Mono", monospace;
+    font-style: normal;
+    font-size: 0.8rem;
+    color: white;
 }
 
 .block-code {
-	background-color: black;
-	border-radius: 12px;
-	width: 100%;
-	padding: 2px 6px;
-	box-sizing: border-box;
+    background-color: black;
+    border-radius: 12px;
+    width: 100%;
+    padding: 2px 6px;
+    box-sizing: border-box;
 }
 
-
-.accept { background: var(--green); color: var(--text-color); }
-.decline { background: var(--red); color: var(--text-color); }
+.accept {
+    background: var(--green);
+    color: var(--text-color);
+}
+.decline {
+    background: var(--red);
+    color: var(--text-color);
+}
