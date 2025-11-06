@@ -22,7 +22,6 @@ let isMuted = false;
 // КОНФИГУРАЦИЯ WEBRTC
 const configuration = {
     iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
         {
             urls: 'turn:turn.falbue.ru:3478',
             username: 'falbue',
