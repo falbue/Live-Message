@@ -20,7 +20,7 @@ let isVideoEnabled = false;
 let isMuted = false;
 
 // КОНФИГУРАЦИЯ WEBRTC
-const iceServers = {
+const configuration = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         {
@@ -31,9 +31,8 @@ const iceServers = {
     ]
 };
 
-// ИНИЦИАЛИЗАЦИЯ PEER CONNECTION
 function initPeerConnection(isInitiator) {
-    peerConnection = new RTCPeerConnection(iceServers);
+    peerConnection = new RTCPeerConnection(configuration);
 
     peerConnection.onicecandidate = event => {
         if (event.candidate) {
