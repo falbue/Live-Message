@@ -23,6 +23,11 @@ let isMuted = false;
 const iceServers = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
+        {
+            urls: 'turn:turn.falbue.ru:3478',
+            username: 'falbue',
+            credential: 'turn_password'
+        }
     ]
 };
 
