@@ -133,6 +133,8 @@ button>i,
 	position: relative;
 	display: flex;
 	flex-direction: column;
+	background-color: var(--input);
+	border-radius: 12px 12px 0 0;
 }
 
 nav {
@@ -145,8 +147,6 @@ nav {
 	box-sizing: border-box;
 	margin-right: auto;
 	flex-direction: row-reverse;
-	background-color: var(--black);
-	border-radius: 12px 12px 0 0;
 }
 
 nav > .buttons {
@@ -165,7 +165,7 @@ nav > .buttons {
 
 .resize-handle {
 	height: 6px;
-	background: var(--gray);
+	background: rgba(0, 0, 0, 0.1);
 	cursor: ns-resize;
 	margin-bottom: -3px;
 	z-index: 5;
