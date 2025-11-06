@@ -60,5 +60,5 @@
 ## Контакты
 
 Если у вас есть вопросы или предложения, свяжитесь с нами:
-- Email: your-email@example.com
-- GitHub: [https://github.com/falbue/live-message](https://github.com/falbue/live-message)
+- Email: cyansair05@gmail.com
+- GitHub: [https://github.com/falbue](https://github.com/falbue)
