@@ -1,4 +1,3 @@
-/* Стили для UI прикрепления файлов */
 .attachments {
     display: flex;
     gap: 8px;
@@ -12,14 +11,7 @@
     align-items: center;
     gap: 8px;
     padding: 6px 8px;
-    background: rgba(0, 0, 0, 0.04);
-    border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.06);
     min-width: 120px;
-}
-
-.attachment.received {
-    background: rgba(0, 0, 0, 0.02);
 }
 
 .attachment-preview {
@@ -47,26 +39,14 @@
 }
 
 .attachment-remove {
-    margin-left: auto;
-    background: transparent;
-    border: none;
-    color: var(--text-color);
     font-size: 1.2rem;
-    cursor: pointer;
 }
 
 .textarea-wrapper.drag-over {
-    outline: 2px dashed rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
+    outline: 2px dashed var(--text-color);
+    border-radius: 8px 8px 0 0;
 }
 
 .received-attachments {
     padding: 6px 12px;
-}
-
-.attachment-download {
-    margin-left: 8px;
-    font-size: 0.9rem;
-    color: var(--text-color);
-    text-decoration: underline;
 }

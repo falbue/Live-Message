@@ -48,8 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const link = document.createElement("a");
             link.href = a.dataUrl;
             link.download = a.name;
-            link.textContent = "Скачать";
-            link.className = "attachment-download";
+            link.className = "button";
+
+            const icon = document.createElement("i");
+            icon.className = "iconoir-download";
+            link.appendChild(icon);
+
             item.appendChild(link);
 
             container.appendChild(item);
