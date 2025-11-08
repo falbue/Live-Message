@@ -60,5 +60,14 @@ def handle_ice_candidate(data):
     socketio.emit("webrtc:ice-candidate", data, to=chat_id, skip_sid=request.sid)  # pyright: ignore[reportAttributeAccessIssue]
 
 
+@socketio.on("update_attachments")
+def handle_update_attachments(data):
+    """При получении списка прикреплённых файлов от клиента — рассылка остальным в комнате."""
+    chat_id = data.get("chat_id")
+    if not chat_id:
+        return
+    socketio.emit("receive_attachments", data, to=chat_id, skip_sid=request.sid)  # pyright: ignore[reportAttributeAccessIssue]
+
+
 if __name__ == "__main__":
     socketio.run(app, host="0.0.0.0", port=80, debug=True)

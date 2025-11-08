@@ -28,19 +28,19 @@ content %}
                 <button id="audioCallButton">
                     <i class="iconoir-phone"></i>
                 </button>
+                <button id="attachButton" title="Прикрепить файл">
+                    <i class="iconoir-attachment"></i>
+                </button>
                 <button id="shareButton">
                     <i class="iconoir-share-android"></i>
                 </button>
             </div>
         </nav>
         <div class="textarea-wrapper">
+            <div id="attachments" class="attachments" aria-live="polite"></div>
+            <input id="fileInput" type="file" multiple style="display:none" />
             <div class="resize-handle"><i class="iconoir-menu"></i></div>
-            <textarea
-                rows="1"
-                id="inputMessage"
-                placeholder="Введите сообщение..."
-                inputmode="text"
-            ></textarea>
+            <textarea rows="1" id="inputMessage" placeholder="Введите сообщение..." inputmode="text"></textarea>
         </div>
     </div>
 </main>
@@ -49,10 +49,7 @@ content %}
 <script src="{{ url_for('static', filename='scripts/calls.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/share.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/resize.js') }}"></script>
-<script
-    src="{{ url_for('static', filename='scripts/notification.js') }}"
-    defer
-></script>
+<script src="{{ url_for('static', filename='scripts/notification.js') }}" defer></script>
 
 <script>
     if ("visualViewport" in window) {
