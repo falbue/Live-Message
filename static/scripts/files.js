@@ -34,7 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (a.type && a.type.startsWith("image/")) {
                 const img = document.createElement("img");
-                img.src = a.dataUrl;
+                // Поддерживаем серверный URL или локальный dataUrl
+                img.src = a.dataUrl || a.url || '';
                 img.alt = a.name;
                 img.className = "attachment-preview";
                 item.appendChild(img);
@@ -46,7 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
             item.appendChild(info);
 
             const link = document.createElement("a");
-            link.href = a.dataUrl;
+            // Ссылка на файл: серверный URL когда доступен, иначе dataUrl
+            link.href = a.url || a.dataUrl || '#';
             link.download = a.name;
             link.textContent = "Скачать";
             link.className = "attachment-download";
@@ -73,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (att.type && att.type.startsWith("image/")) {
                 const img = document.createElement("img");
-                img.src = att.dataUrl;
+                img.src = att.dataUrl || att.url || '';
                 img.alt = att.name;
                 img.className = "attachment-preview";
                 el.appendChild(img);
@@ -104,7 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function emitAttachmentsUpdate() {
-        const payload = attachments.map((a) => ({ id: a.id, name: a.name, size: a.size, type: a.type, dataUrl: a.dataUrl }));
+        // По возможности отправляем только метаданные и URL файлов, чтобы не перегружать socket
+        const payload = attachments.map((a) => ({ id: a.id, name: a.name, size: a.size, type: a.type, url: a.url }));
         socket.emit('update_attachments', { chat_id: chatId, sender_id: senderId, attachments: payload });
     }
 
@@ -129,7 +132,31 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        Promise.all(readers).then(() => {
+        // После создания локальных превью — показываем их, затем загружаем файлы на сервер
+        Promise.all(readers).then(async () => {
+            renderAttachments();
+
+            try {
+                const form = new FormData();
+                files.forEach((f) => form.append('files', f));
+                const res = await fetch('/upload', { method: 'POST', body: form });
+                if (res.ok) {
+                    const data = await res.json();
+                    (data.files || []).forEach((u, idx) => {
+                        const att = attachments[idx];
+                        if (att) {
+                            att.url = u.url;
+                            // удаляем dataUrl чтобы не отправлять большой base64 по sockets
+                            delete att.dataUrl;
+                        }
+                    });
+                } else {
+                    console.warn('Upload failed', res.status);
+                }
+            } catch (err) {
+                console.error('Upload error', err);
+            }
+
             renderAttachments();
             emitAttachmentsUpdate();
         });
