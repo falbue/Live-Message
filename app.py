@@ -1,17 +1,9 @@
 import uuid
-import os
-import base64
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, join_room
 
 app = Flask(__name__)
-
-# Папка для загруженных файлов
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "static", "uploads")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
 socketio = SocketIO(app, async_mode="eventlet")
 
 
@@ -75,33 +67,6 @@ def handle_update_attachments(data):
     if not chat_id:
         return
     socketio.emit("receive_attachments", data, to=chat_id, skip_sid=request.sid)  # pyright: ignore[reportAttributeAccessIssue]
-
-
-@app.route("/upload", methods=["POST"])
-def upload_files():
-    # Принимаем multipart/form-data с полем files (может быть несколько файлов)
-    # Изменено: не сохраняем файлы на диск. Читаем содержимое и возвращаем base64-данные.
-    files = request.files.getlist("files")
-    saved = []
-    for f in files:
-        if not f or f.filename == "":
-            continue
-        # читаем содержимое в память
-        content = f.read()
-        size = len(content)
-        # кодируем в base64 для передачи в JSON; формируем data URL
-        b64 = base64.b64encode(content).decode("ascii")
-        mime = f.mimetype or "application/octet-stream"
-        data_url = f"data:{mime};base64,{b64}"
-        saved.append(
-            {
-                "name": f.filename,
-                "size": size,
-                "type": mime,
-                "data": data_url,
-            }
-        )
-    return jsonify({"files": saved})
 
 
 if __name__ == "__main__":
