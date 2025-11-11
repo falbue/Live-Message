@@ -29,4 +29,14 @@ sc.onReceive((data) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     typeText('displayMessage', 'Ожидание пользователя...');
+    const copyEl = document.querySelector('.copy');
+    if (copyEl && chatId) {
+        const mask = (id => {
+            if (!id) return '';
+            if (id.length < 10) return id;
+            return id.slice(0, 3) + '***' + id.slice(-3);
+        })(chatId);
+        copyEl.textContent = mask;
+        copyEl.setAttribute('data-full', chatId);
+    }
 });

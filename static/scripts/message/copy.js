@@ -7,9 +7,12 @@
 
     function findPre(node) {
         while (node) {
-            if (node.nodeType === 1 && node.matches) {
-                if (node.matches('pre')) return node;
-                if (node.matches('.inline')) return node;
+            if (node.nodeType === 1) {
+                if (node.matches) {
+                    if (node.matches('pre.copy') || node.matches('.copy')) return node;
+                } else if (node.classList && node.classList.contains('copy')) {
+                    return node;
+                }
             }
             node = node.parentNode;
         }
@@ -20,7 +23,9 @@
         if (!pre) return;
         e.preventDefault();
         var code = pre.querySelector('code');
-        var text = (code ? code.innerText : pre.innerText || '').trim();
+        // Если установлен data-full — копируем полный (не маскированный) id/текст
+        var text = (pre.dataset && pre.dataset.full) ? pre.dataset.full : (code ? code.innerText : pre.innerText || '');
+        text = (text || '').trim();
         if (!text) return;
         copy(text);
         notification('Скопировано');

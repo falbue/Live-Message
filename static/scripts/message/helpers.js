@@ -19,7 +19,7 @@ export function formatMessage(message) {
             out += escapeHtml(beforeSeg).replace(/\n/g, '<br>');
             const codeContent = m[1];
             const escapedCode = escapeHtml(codeContent).replace(/\n/g, '<br>');
-            out += `<i class="inline">${escapedCode}</i>`;
+            out += `<i class="inline copy">${escapedCode}</i>`;
             li = m.index + m[0].length;
         }
         const restSeg = segment.slice(li);
@@ -33,7 +33,7 @@ export function formatMessage(message) {
         result += formatSegmentWithInlineCode(before);
         const langClass = lang ? `language-${lang}` : '';
         const escapedCode = escapeHtml(code);
-        result += `<pre><code class="${langClass}">${escapedCode}</code></pre>`;
+        result += `<pre><code class="${langClass} copy">${escapedCode}</code></pre>`;
         lastIndex = match.index + full.length;
     }
 
