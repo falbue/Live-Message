@@ -132,7 +132,7 @@ button>i,
 
 @media (max-width: 768px) {
     .hero {
-        height: 95vh;
+        height: 100vh;
         margin-right: 0;
         width: 100%;
         text-align: center;
@@ -162,7 +162,7 @@ nav {
     align-items: flex-end;
     justify-content: space-between;
     width: 100%;
-    padding: 6px 10px;
+    padding: 6px;
     box-sizing: border-box;
     margin-right: auto;
     flex-direction: row-reverse;
@@ -184,7 +184,6 @@ nav>.buttons {
 
 .resize-handle {
     height: 6px;
-    background: rgba(0, 0, 0, 0.1);
     cursor: ns-resize;
     margin-bottom: -3px;
     z-index: 5;
@@ -193,12 +192,6 @@ nav>.buttons {
     align-items: center;
     justify-content: center;
     color: var(--text-color);
-}
-
-@media (max-width: 768px) {
-    .resize-handle {
-        height: 10px;
-    }
 }
 
 textarea {
@@ -210,7 +203,6 @@ textarea {
     border: none;
     box-sizing: border-box;
     min-height: 1.2em;
-    /*max-height: calc(1.2em * 11);*/
     max-height: 40dvh;
     line-height: 1.2em;
     resize: none;
@@ -241,4 +233,5 @@ code {
     font-family: "Ubuntu Mono", monospace;
     font-style: normal;
     font-size: 0.8rem;
+    border-radius: 12px;
 }

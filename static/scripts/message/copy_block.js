@@ -7,7 +7,7 @@
 
     function findPre(node) {
         while (node) {
-            if (node.nodeType === 1 && node.matches && node.matches('pre.block-code')) return node;
+            if (node.nodeType === 1 && node.matches && node.matches('pre')) return node;
             node = node.parentNode;
         }
     }
