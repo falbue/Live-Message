@@ -56,3 +56,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   autoResize();
 });
+
+if ("visualViewport" in window) {
+  window.visualViewport.addEventListener("resize", () => {
+    document.documentElement.style.setProperty(
+      "--vh",
+      `${window.visualViewport.height}px`,
+    );
+  });
+} else {
+  window.addEventListener("resize", () => {
+    document.documentElement.style.setProperty(
+      "--vh",
+      `${window.innerHeight}px`,
+    );
+  });
+}

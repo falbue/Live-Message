@@ -3,11 +3,10 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#CDBCE2" />
 
     <title>{% block title %}{% endblock %}</title>
     <meta name="description"
-        content="Анонимный чат в реальном времени: отправляйте одно сообщение без регистрации. Общайтесь свободно, без истории переписки и идентификации!" />
+        content="Анонимный чат в реальном времени. Общайтесь свободно, без истории переписки и идентификации!" />
     <meta name="keywords" content="chat, anonymous, chatroom" />
     <meta name="author" content="falbue" />
     <meta name="robots" content="index, nofollow" />
@@ -27,6 +26,13 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('.static', filename='css/main.css') }}" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css"
+        media="(prefers-color-scheme: light)">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css"
+        media="(prefers-color-scheme: dark)">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 </head>
 
 <body>

@@ -132,7 +132,7 @@ button>i,
 
 @media (max-width: 768px) {
     .hero {
-        height: 95vh;
+        height: 100vh;
         margin-right: 0;
         width: 100%;
         text-align: center;
@@ -154,18 +154,18 @@ button>i,
     flex-direction: column;
     background-color: var(--input);
     border-radius: 12px 12px 0 0;
+    box-shadow: 0px -6px 12px 0px rgba(0, 0, 0, 0.25);
 }
 
 nav {
     z-index: 100;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 6px 10px;
+    padding: 6px;
     box-sizing: border-box;
     margin-right: auto;
-    flex-direction: row-reverse;
 }
 
 nav>.buttons {
@@ -183,8 +183,7 @@ nav>.buttons {
 }
 
 .resize-handle {
-    height: 6px;
-    background: rgba(0, 0, 0, 0.1);
+    opacity: 0.2;
     cursor: ns-resize;
     margin-bottom: -3px;
     z-index: 5;
@@ -193,12 +192,6 @@ nav>.buttons {
     align-items: center;
     justify-content: center;
     color: var(--text-color);
-}
-
-@media (max-width: 768px) {
-    .resize-handle {
-        height: 10px;
-    }
 }
 
 textarea {
@@ -210,7 +203,6 @@ textarea {
     border: none;
     box-sizing: border-box;
     min-height: 1.2em;
-    /*max-height: calc(1.2em * 11);*/
     max-height: 40dvh;
     line-height: 1.2em;
     resize: none;
@@ -241,13 +233,12 @@ code {
     font-family: "Ubuntu Mono", monospace;
     font-style: normal;
     font-size: 0.8rem;
-    color: white;
+    border-radius: 12px;
 }
 
-.block-code {
-    background-color: black;
-    border-radius: 12px;
-    width: 100%;
-    padding: 2px 6px;
-    box-sizing: border-box;
+.inline {
+    font-family: "Ubuntu Mono", monospace;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 4px 6px;
 }
