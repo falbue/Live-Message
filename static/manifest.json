@@ -1,0 +1,26 @@
+{
+  "name": "Live Message",
+  "short_name": "LiveMsg",
+  "description": "Анонимный чат в реальном времени: отправляйте сообщения без регистрации. Общайтесь свободно!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#CDBCE2",
+  "theme_color": "#CDBCE2",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "communication"],
+  "lang": "ru"
+}
