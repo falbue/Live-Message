@@ -16,6 +16,7 @@ body {
     padding: 0;
     background-color: var(--backgrond);
 }
+
 main {
     height: var(--vh);
     box-sizing: border-box;
@@ -31,9 +32,11 @@ a {
 h1 {
     font-size: 4rem;
 }
+
 h2 {
     font-size: 2rem;
 }
+
 h3 {
     font-size: 1.5rem;
 }
@@ -42,9 +45,11 @@ h3 {
     h1 {
         font-size: clamp(2rem, 6vw, 3rem);
     }
+
     h2 {
         font-size: clamp(1.125rem, 4vw, 1.125rem);
     }
+
     h3 {
         font-size: clamp(1.125rem, 4.5vw, 1.25rem);
     }
@@ -84,8 +89,8 @@ button,
     cursor: pointer;
 }
 
-button > i,
-.button > i {
+button>i,
+.button>i {
     font-size: 1.2rem;
 }
 
@@ -95,7 +100,6 @@ button > i,
     inset: 20px auto auto 50%;
     transform: translateX(-50%);
     background-color: var(--button);
-    color: var(--adptive-text);
     padding: 10px 20px;
     border-radius: 12px;
     z-index: 9999;
@@ -119,6 +123,7 @@ button > i,
     padding: 20px 0;
     box-sizing: border-box;
 }
+
 .hero::before {
     content: "";
     flex: 0 0 auto;
@@ -163,7 +168,7 @@ nav {
     flex-direction: row-reverse;
 }
 
-nav > .buttons {
+nav>.buttons {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -211,6 +216,7 @@ textarea {
     resize: none;
     overflow-y: auto;
 }
+
 textarea:focus {
     outline: none;
 }
@@ -221,9 +227,11 @@ textarea:focus {
         bottom: 20px;
         font-size: 1.4rem;
     }
+
     nav {
         bottom: 100px !important;
     }
+
     textarea {
         font-size: 1.2rem;
     }
@@ -242,13 +250,4 @@ code {
     width: 100%;
     padding: 2px 6px;
     box-sizing: border-box;
-}
-
-.accept {
-    background: var(--green);
-    color: var(--text-color);
-}
-.decline {
-    background: var(--red);
-    color: var(--text-color);
 }

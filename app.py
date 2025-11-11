@@ -1,6 +1,5 @@
 import uuid
-
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 from flask_socketio import SocketIO, join_room
 
 app = Flask(__name__)
@@ -18,46 +17,17 @@ def chat(chat_id):
     return render_template("chat.html", chat_id=chat_id)
 
 
-@socketio.on("join_chat")
-def on_join(data):
-    chat_id = data["chat_id"]
-    join_room(chat_id)
-    socketio.emit(
-        "receive_message",
-        {"text": "Пользователь подключился!", "sender_id": data["sender_id"]},
-        to=chat_id,
-    )
-
-
 @socketio.on("update_message")
 def handle_message(data):
+    chat_id = data.get("chat_id")
+    if chat_id:
+        join_room(chat_id)
+
     socketio.emit(
         "receive_message",
-        {"text": data["text"], "sender_id": data["sender_id"]},
-        to=data["chat_id"],
+        {"text": data.get("text"), "sender_id": data.get("sender_id")},
+        to=chat_id,
     )
-
-
-@socketio.on("call:request")
-def handle_call_request(data):
-    chat_id = data["chatId"]
-    socketio.emit("call:incoming", data, to=chat_id, skip_sid=request.sid)  # pyright: ignore[reportAttributeAccessIssue]
-
-
-@socketio.on("call:response")
-def handle_call_response(data):
-    chat_id = data["chatId"]
-    if data["accepted"]:
-        socketio.emit("call:accepted", data, to=chat_id, skip_sid=request.sid)  # pyright: ignore[reportAttributeAccessIssue]
-    else:
-        socketio.emit("call:rejected", data, to=chat_id, skip_sid=request.sid)  # pyright: ignore[reportAttributeAccessIssue]
-
-
-# WebRTC сигнализация
-@socketio.on("webrtc:ice-candidate")
-def handle_ice_candidate(data):
-    chat_id = data["chatId"]
-    socketio.emit("webrtc:ice-candidate", data, to=chat_id, skip_sid=request.sid)  # pyright: ignore[reportAttributeAccessIssue]
 
 
 if __name__ == "__main__":

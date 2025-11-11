@@ -13,7 +13,6 @@
 
 @media (prefers-color-scheme: light) {
     :root {
-        --bg-color: var(--black);
         --text-color: var(--black);
         --button: var(--ligth2);
         --backgrond: var(--ligth);
@@ -24,7 +23,6 @@
 @media (prefers-color-scheme: dark) {
     :root {
         --text-color: var(--white);
-        --bg-color: var(--white);
         --button: var(--dark2);
         --backgrond: var(--dark);
         --input: var(--black);
@@ -44,18 +42,6 @@
     font-size: 0;
     opacity: 0;
     pointer-events: none !important;
-}
-.hidden * {
-    visibility: hidden !important;
-    width: 0;
-    height: 0;
-}
-
-#videoCallButton {
-    display: none;
-}
-#videoContainer {
-    display: none;
 }
 
 .show {
