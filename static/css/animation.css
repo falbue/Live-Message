@@ -16,14 +16,3 @@ button:active,
     transform: scale(0.98);
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0);
 }
-
-/* Опционально: анимация вращения градиента */
-@keyframes rotate-border {
-    0% {
-        background: linear-gradient(0deg, #ff8a00, #e52e71, #22c1c3);
-    }
-
-    100% {
-        background: linear-gradient(360deg, #ff8a00, #e52e71, #22c1c3);
-    }
-}
