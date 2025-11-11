@@ -21,7 +21,11 @@ function formatMessage(message) {
     return escapedMessage.replace(/\n/g, "<br>");
 }
 
-socket.emit("join_chat", { chat_id: chatId, sender_id: senderId });
+socket.emit("update_message", {
+    chat_id: chatId,
+    text: "Пользователь подключился!",
+    sender_id: senderId,
+});
 
 inputMessage.addEventListener("input", () => {
     const messageText = inputMessage.value.trim() || "...";
@@ -37,82 +41,6 @@ socket.on("receive_message", (data) => {
         displayMessage.innerHTML = formatMessage(data.text);
     }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function typeText(elementId, text) {
     const element = document.querySelector(`#${elementId} b`);
