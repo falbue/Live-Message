@@ -8,37 +8,13 @@ content %}
 
     <div class="input-message">
         <nav>
-            <div id="videoContainer" class="hidden">
-                <video id="localVideo" autoplay muted playsinline></video>
-                <video id="remoteVideo" autoplay playsinline></video>
-            </div>
             <div class="buttons">
-                <button id="muteButton" class="hidden">
-                    <i class="iconoir-microphone"></i>
-                </button>
-                <button id="videoCallButton" class="hidden">
-                    <i class="iconoir-video-camera"></i>
-                </button>
-                <button id="acceptCall" class="call-btn accept hidden">
-                    <i class="iconoir-phone"></i>
-                </button>
-                <button id="declineCall" class="call-btn decline hidden">
-                    <i class="iconoir-phone-disabled"></i>
-                </button>
-                <button id="audioCallButton">
-                    <i class="iconoir-phone"></i>
-                </button>
-                <button id="attachButton" title="Прикрепить файл">
-                    <i class="iconoir-attachment"></i>
-                </button>
                 <button id="shareButton">
                     <i class="iconoir-share-android"></i>
                 </button>
             </div>
         </nav>
         <div class="textarea-wrapper">
-            <div id="attachments" class="attachments" aria-live="polite"></div>
-            <input id="fileInput" type="file" multiple style="display:none" />
             <div class="resize-handle"><i class="iconoir-menu"></i></div>
             <textarea rows="1" id="inputMessage" placeholder="Введите сообщение..." inputmode="text"></textarea>
         </div>
@@ -46,8 +22,6 @@ content %}
 </main>
 
 <script src="{{ url_for('static', filename='scripts/message.js') }}"></script>
-<script src="{{ url_for('static', filename='scripts/files.js') }}"></script>
-<script src="{{ url_for('static', filename='scripts/calls.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/share.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/resize.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/notification.js') }}" defer></script>
