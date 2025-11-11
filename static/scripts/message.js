@@ -4,6 +4,11 @@ const inputMessage = document.getElementById("inputMessage");
 const displayMessage = document.getElementById("displayMessage");
 const senderId = Math.random().toString(36).substr(2, 9);
 
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.hljs && typeof hljs.highlightAll === 'function') {
+        try { hljs.highlightAll(); } catch (e) { }
+    }
+});
 
 function formatMessage(message) {
     const escapeHtml = (str) => {
@@ -11,14 +16,29 @@ function formatMessage(message) {
         div.textContent = str;
         return div.innerHTML;
     };
-    let escapedMessage = escapeHtml(message);
 
-    const codeBlockPattern = /```([\s\S]*?)```/g;
-    escapedMessage = escapedMessage.replace(
-        codeBlockPattern,
-        '<pre class="block-code"><code>$1</code></pre>',
-    );
-    return escapedMessage.replace(/\n/g, "<br>");
+    const codeBlockPattern = /```(\w+)?\n?([\s\S]*?)```/g;
+    let result = "";
+    let lastIndex = 0;
+    let match;
+
+    while ((match = codeBlockPattern.exec(message)) !== null) {
+        const [full, lang, code] = match;
+        const before = message.slice(lastIndex, match.index);
+        result += escapeHtml(before).replace(/\n/g, "<br>");
+
+        const langClass = lang ? `language-${lang}` : "";
+        const escapedCode = escapeHtml(code);
+
+        result += `<pre><code class="${langClass}">${escapedCode}</code></pre>`;
+
+        lastIndex = match.index + full.length;
+    }
+
+    const rest = message.slice(lastIndex);
+    result += escapeHtml(rest).replace(/\n/g, "<br>");
+
+    return result;
 }
 
 socket.emit("update_message", {
@@ -39,6 +59,15 @@ inputMessage.addEventListener("input", () => {
 socket.on("receive_message", (data) => {
     if (data.sender_id !== senderId) {
         displayMessage.innerHTML = formatMessage(data.text);
+
+        const codeBlocks = displayMessage.querySelectorAll("pre code");
+        if (window.hljs && codeBlocks.length) {
+            codeBlocks.forEach((block) => {
+                try {
+                    hljs.highlightElement(block);
+                } catch (e) { }
+            });
+        }
     }
 });
 

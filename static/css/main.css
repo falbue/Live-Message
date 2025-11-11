@@ -241,13 +241,4 @@ code {
     font-family: "Ubuntu Mono", monospace;
     font-style: normal;
     font-size: 0.8rem;
-    color: white;
-}
-
-.block-code {
-    background-color: black;
-    border-radius: 12px;
-    width: 100%;
-    padding: 2px 6px;
-    box-sizing: border-box;
 }
