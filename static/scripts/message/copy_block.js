@@ -7,7 +7,10 @@
 
     function findPre(node) {
         while (node) {
-            if (node.nodeType === 1 && node.matches && node.matches('pre')) return node;
+            if (node.nodeType === 1 && node.matches) {
+                if (node.matches('pre')) return node;
+                if (node.matches('.inline')) return node;
+            }
             node = node.parentNode;
         }
     }
