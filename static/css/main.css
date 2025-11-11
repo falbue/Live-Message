@@ -184,7 +184,7 @@ nav>.buttons {
 }
 
 .resize-handle {
-    height: 6px;
+    opacity: 0.2;
     cursor: ns-resize;
     margin-bottom: -3px;
     z-index: 5;
