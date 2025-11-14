@@ -14,7 +14,7 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
-    background-color: var(--backgrond);
+    background-color: var(--background);
 }
 
 main {
@@ -120,7 +120,6 @@ button>i,
     margin-right: auto;
     justify-content: space-between;
     min-height: 400px;
-    padding: 20px 0;
     box-sizing: border-box;
 }
 
