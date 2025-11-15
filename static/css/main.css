@@ -208,7 +208,6 @@ nav>.buttons {
 .input-area {
     display: flex;
     align-items: flex-end;
-    gap: 8px;
     box-sizing: border-box;
 }
 

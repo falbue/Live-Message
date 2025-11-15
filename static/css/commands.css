@@ -14,3 +14,8 @@
     gap: 8px;
     align-items: center;
 }
+
+.commands>.list>.item:hover,
+.commands>.list>.item.active {
+    background-color: rgba(0, 0, 0, 0.05);
+}

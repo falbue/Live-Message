@@ -1,215 +1,231 @@
-Replace file with clean implementation for command popup functionality(initialize from DOM, keyboard nav, Enter execution)
-        if (!raw.startsWith('/')) return hideCommandPopup();
-const parts = raw.split(/\s+/);
-const cmd = parts[0].slice(1);
-const args = parts.slice(1).join(' ').trim();
-if (cmd === 'username') {
-    if (!args) {
-        server_command('Не задано новое имя. Введите "/username новое_имя"');
-        return;
-    }
-    try {
-        localStorage.setItem('username', args);
-        server_command(`Имя пользователя установлено: ${args}`);
-    } catch (e) {
-        server_command('Ошибка при сохранении имени пользователя');
-        import { server_command } from './typing.js';
+import { server_command } from './typing.js';
 
-        let commandPopup = null;
-        let titleEl = null;
-        let descEl = null;
-        let listEl = null;
-        let actionBtn = null;
-        const getUsername = () => localStorage.getItem('username') || '';
+(function () {
+    const commands = [
+        { name: '/help', desc: 'Помощь' },
+        { name: '/username', desc: 'Сменить имя пользователя' }
+    ];
 
-        // registry of commands: {name, description, handler(optional)}
-        const commands = [
-            { name: 'username', description: 'Установить имя пользователя' },
-            { name: 'help', description: 'Помощь' }
-        ];
+    const el = {
+        commandsWrap: document.querySelector('.commands'),
+        list: document.querySelector('.commands .list'),
+        input: document.getElementById('inputMessage'),
+        resetBtn: document.getElementById('reset'),
+        execBtn: document.getElementById('exec'),
+    };
 
-        export function registerCommand(cmd) {
+    if (!el.input || !el.commandsWrap || !el.list) return;
+
+    let filtered = commands.slice();
+    let selected = -1;
+    let lastMouseIndex = -1;
+
+    window.LMCommands = {
+        add(cmd) {
             if (!cmd || !cmd.name) return;
-            const exists = commands.find(c => c.name === cmd.name);
-            if (exists) Object.assign(exists, cmd); else commands.push(cmd);
+            commands.push(cmd);
+        },
+        list() {
+            return commands.slice();
+        }
+    };
+
+    function renderList() {
+        el.list.innerHTML = '';
+        if (filtered.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'item empty';
+            empty.innerHTML = '<p class="desc">Команд не найдено</p>';
+            el.list.appendChild(empty);
+            return;
         }
 
-        function ensurePopup() {
-            if (commandPopup) return;
-            commandPopup = document.querySelector('.command-inline-popup');
-            if (!commandPopup) {
-                // fallback: create minimal popup and append to body
-                commandPopup = document.createElement('div');
-                commandPopup.className = 'command-inline-popup';
-                commandPopup.innerHTML = `<div class="command-title"></div><div class="command-desc"></div><div class="command-list"></div><button class="command-action">Выполнить</button>`;
-                document.body.appendChild(commandPopup);
-                commandPopup.style.position = 'fixed';
-            }
+        filtered.forEach((cmd, idx) => {
+            const item = document.createElement('div');
+            item.className = 'item';
+            item.tabIndex = 0;
+            item.dataset.index = idx;
+            item.innerHTML = `\n                <h4 class="name">${escapeHtml(cmd.name)}</h4>\n                <p class="desc">${escapeHtml(cmd.desc || '')}</p>\n            `;
+            item.addEventListener('click', () => selectAndInsert(idx));
 
-            titleEl = commandPopup.querySelector('.command-title');
-            descEl = commandPopup.querySelector('.command-desc');
-            listEl = commandPopup.querySelector('.command-list');
-            actionBtn = commandPopup.querySelector('.command-action');
-
-            let selectedIndex = -1;
-
-            function renderList(items) {
-                listEl.innerHTML = '';
-                const max = Math.min(items.length, 10);
-                for (let i = 0; i < max; i++) {
-                    const c = items[i];
-                    const item = document.createElement('div');
-                    item.className = 'command-item';
-                    item.dataset.idx = i;
-                    const left = document.createElement('div');
-                    left.className = 'cmd-left';
-                    const name = document.createElement('div');
-                    name.className = 'cmd-name';
-                    name.textContent = `/${c.name}`;
-                    const d = document.createElement('div');
-                    d.className = 'cmd-desc';
-                    d.textContent = c.description || '';
-                    left.appendChild(name);
-                    left.appendChild(d);
-                    item.appendChild(left);
-                    item.addEventListener('click', () => {
-                        const inputMessage = document.getElementById('inputMessage');
-                        if (inputMessage) inputMessage.value = `/${c.name} `;
-                        hideCommandPopup();
-                        if (inputMessage) inputMessage.focus();
-                    });
-                    listEl.appendChild(item);
-                }
-                selectedIndex = -1;
-            }
-
-            function selectOffset(offset) {
-                const items = listEl.querySelectorAll('.command-item');
-                if (!items.length) return;
-                selectedIndex = Math.max(0, Math.min(items.length - 1, selectedIndex + offset));
-                items.forEach((it, idx) => {
-                    it.classList.toggle('command-item--selected', idx === selectedIndex);
-                });
-            }
-
-            function chooseSelected() {
-                const items = listEl.querySelectorAll('.command-item');
-                if (selectedIndex >= 0 && selectedIndex < items.length) {
-                    items[selectedIndex].click();
-                }
-            }
-
-            function executeCommand(raw) {
-                if (!raw || !raw.startsWith('/')) return;
-                const parts = raw.split(/\s+/);
-                const cmd = parts[0].slice(1);
-                const args = parts.slice(1).join(' ').trim();
-
-                if (cmd === 'username') {
-                    if (!args) {
-                        server_command('Не задано новое имя. Введите "/username новое_имя"');
-                        return;
-                    }
-                    try {
-                        localStorage.setItem('username', args);
-                        server_command(`Имя пользователя установлено: ${args}`);
-                    } catch (e) {
-                        server_command('Ошибка при сохранении имени пользователя');
-                    }
-                    const inputMessage = document.getElementById('inputMessage');
-                    if (inputMessage) inputMessage.value = '';
-                    hideCommandPopup();
-                    return;
-                }
-
-                if (cmd === 'help') {
-                    server_command('Доступные команды: ' + commands.map(c => `/${c.name} - ${c.description}`).join('; '));
-                    hideCommandPopup();
-                    return;
-                }
-
-                server_command(`Неизвестная команда: /${cmd}`);
-                hideCommandPopup();
-            }
-
-            // action button
-            actionBtn.addEventListener('click', () => {
-                const inputMessage = document.getElementById('inputMessage');
-                if (!inputMessage) return hideCommandPopup();
-                executeCommand(inputMessage.value.trim());
+            item.addEventListener('mouseenter', () => {
+                lastMouseIndex = idx;
+                selected = idx;
+                updateSelection();
             });
-
-            // keyboard navigation: up/down in list, enter to choose/execute
-            function onKey(e) {
-                if (!commandPopup || commandPopup.style.display !== 'block') return;
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    selectOffset(1);
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    selectOffset(-1);
-                } else if (e.key === 'Enter') {
-                    const inputMessage = document.getElementById('inputMessage');
-                    if (selectedIndex >= 0) {
-                        e.preventDefault();
-                        chooseSelected();
-                    } else if (inputMessage && document.activeElement === inputMessage && !e.shiftKey) {
-                        e.preventDefault();
-                        executeCommand(inputMessage.value.trim());
-                    }
-                } else if (e.key === 'Escape') {
-                    hideCommandPopup();
+            item.addEventListener('mouseleave', () => {
+                if (lastMouseIndex === idx) {
+                    lastMouseIndex = -1;
+                    selected = -1;
+                    updateSelection();
                 }
-            }
-            document.addEventListener('keydown', onKey);
+            });
+            el.list.appendChild(item);
+        });
+        updateSelection();
+    }
 
-            // expose small API on element
-            commandPopup._renderList = renderList;
-            commandPopup._setTitle = (t) => { if (titleEl) titleEl.textContent = t || ''; };
-            commandPopup._setDesc = (t) => { if (descEl) descEl.textContent = t || ''; };
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[c]));
+    }
+
+    function updateSelection() {
+        const items = el.list.querySelectorAll('.item');
+        items.forEach(it => it.classList.remove('active'));
+        if (selected >= 0 && items[selected]) {
+            items[selected].classList.add('active');
+            items[selected].scrollIntoView({ block: 'nearest', inline: 'nearest' });
         }
+    }
 
-        export function showCommandPopup(raw) {
-            ensurePopup();
-            const inputMessage = document.getElementById('inputMessage');
-            if (!raw || !raw.startsWith('/')) return hideCommandPopup();
+    function selectAndInsert(idx) {
+        const cmd = filtered[idx];
+        if (!cmd) return;
+        el.input.value = cmd.name + ' ';
+        filterCommands(cmd.name);
+        showCommands();
+        selected = idx;
+        updateSelection();
+        el.input.focus();
+        try { el.input.selectionStart = el.input.selectionEnd = el.input.value.length; } catch (e) { /* ignore */ }
+    }
+
+    function showCommands() {
+        el.commandsWrap.classList.remove('hidden');
+        el.resetBtn?.classList.add('hidden');
+        el.execBtn?.classList.remove('hidden');
+    }
+
+    function hideCommands() {
+        el.commandsWrap.classList.add('hidden');
+        el.resetBtn?.classList.remove('hidden');
+        el.execBtn?.classList.add('hidden');
+        selected = -1;
+    }
+
+    function filterCommands(text) {
+        const q = (text || '').trim();
+        if (!q || q === '/') {
+            filtered = commands.slice();
+        } else {
+            filtered = commands.filter(c => c.name.startsWith(q) || c.name.includes(q));
+        }
+        selected = filtered.length ? 0 : -1;
+        renderList();
+    }
+
+    // Сами команды
+    const handlers = {
+        '/help': () => {
+            const lines = commands.map(c => `${c.name} — ${c.desc || ''}`).join('\n');
+            server_command(lines);
+        },
+        '/username': () => {
+            // Прочитать введённую строку и взять всё, что идёт после команды
+            const raw = (el.input && el.input.value) ? el.input.value.trim() : '';
             const parts = raw.split(/\s+/);
-            const cmdPart = parts[0].slice(1).toLowerCase();
-            const args = parts.slice(1).join(' ');
-
-            // filter commands by name/includes
-            const filtered = commands.filter(c => c.name && c.name.toLowerCase().includes(cmdPart));
-            if (filtered.length) {
-                commandPopup._setTitle(cmdPart ? `Команды: /${cmdPart}` : 'Команды');
-                commandPopup._setDesc('Нажмите на команду, чтобы подставить её в поле ввода.');
-                commandPopup._renderList(filtered);
-            } else {
-                commandPopup._setTitle(`/${cmdPart}`);
-                // specific help for username
-                if (cmdPart === 'username' || parts[0].toLowerCase() === '/username') {
-                    const cur = getUsername() || '(не задано)';
-                    if (!args) commandPopup._setDesc(`Текущее имя: ${cur}. Введите "/username новое_имя" и нажмите "Выполнить"`);
-                    else commandPopup._setDesc(`Сменить имя с ${cur} на: ${args}`);
-                } else {
-                    commandPopup._setDesc('Неизвестная команда');
-                }
-                commandPopup._renderList([]);
+            const name = parts.slice(1).join(' ').trim();
+            if (!name) {
+                const msg = 'Укажите имя пользователя после команды, например: /username Иван';
+                notification(msg);
+                server_command(msg, 10);
+                return;
             }
-
-            // position popup near input (inside .input-message if present)
-            if (inputMessage && commandPopup.parentElement && commandPopup.parentElement.classList.contains('input-message')) {
-                // position above the textarea inside the relative container
-                commandPopup.style.left = `${Math.max(8, inputMessage.offsetLeft)}px`;
-                commandPopup.style.bottom = `${inputMessage.offsetHeight + 12}px`;
-            } else if (inputMessage) {
-                const rect = inputMessage.getBoundingClientRect();
-                commandPopup.style.left = `${rect.left + window.scrollX}px`;
-                commandPopup.style.top = `${rect.top + window.scrollY - rect.height - 12}px`;
+            try {
+                localStorage.setItem('username', name);
+                const msg = `Имя пользователя установлено: ${name}`;
+                server_command(msg);
+                notification(msg);
+                if (el.input) el.input.value = '';
+            } catch (e) {
+                console.error(e);
+                const err = 'Не удалось сохранить имя пользователя';
+                notification(err);
+                server_command(err);
             }
-            commandPopup.style.display = 'block';
         }
+    };
 
-        export function hideCommandPopup() {
-            if (!commandPopup) return;
-            commandPopup.style.display = 'none';
+    function executeCurrent() {
+        const value = (el.input.value || '').trim();
+        const token = value.split(/\s+/)[0] || '';
+        if (!token.startsWith('/')) return false;
+        const handler = handlers[token];
+        if (handler) {
+            try {
+                handler();
+            } catch (e) {
+                console.error(e);
+                notification('Ошибка при выполнении команды');
+            }
+            el.input.value = '';
+            hideCommands();
+            return true;
+        } else {
+            notification('Неизвестная команда: ' + token);
+            return false;
         }
+    }
+
+    el.input.addEventListener('input', () => {
+        const v = el.input.value || '';
+        if (v.startsWith('/')) {
+            filterCommands(v.split(/\s+/)[0]);
+            showCommands();
+        } else {
+            hideCommands();
+        }
+    });
+
+    el.input.addEventListener('keydown', (ev) => {
+        if (el.commandsWrap.classList.contains('hidden')) return;
+
+        if (ev.key === 'ArrowDown') {
+            ev.preventDefault();
+            if (filtered.length === 0) return;
+            selected = Math.min(filtered.length - 1, Math.max(0, selected + 1));
+            updateSelection();
+            return;
+        }
+        if (ev.key === 'Tab') {
+            ev.preventDefault();
+            if (filtered.length === 0) return;
+            if (selected >= 0 && filtered[selected]) {
+                const cmdName = filtered[selected].name;
+                el.input.value = cmdName + ' ';
+                filterCommands(cmdName);
+                showCommands();
+                el.input.focus();
+                try { el.input.selectionStart = el.input.selectionEnd = el.input.value.length; } catch (e) { /* ignore */ }
+            }
+            return;
+        }
+        if (ev.key === 'ArrowUp') {
+            ev.preventDefault();
+            if (filtered.length === 0) return;
+            selected = Math.max(0, selected - 1);
+            updateSelection();
+            return;
+        }
+        if (ev.key === 'Enter') {
+            ev.preventDefault();
+            executeCurrent();
+            return;
+        }
+    });
+
+    el.execBtn?.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        executeCurrent();
+    });
+
+    // Initialize render
+    filterCommands('/');
+
+})();

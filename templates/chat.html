@@ -10,16 +10,7 @@ content %}
         <div class="commands hidden">
             <h4>Команды</h4>
             <p class="desc">Нажмите на команду, чтобы подставить её в поле ввода</p>
-            <div class="list">
-                <div class="item">
-                    <h4 class="name">/help</h4>
-                    <p class="desc">Помощь</p>
-                </div>
-                <div class="item">
-                    <h4 class="name">/username</h4>
-                    <p class="desc">Сменить имя пользователя</p>
-                </div>
-            </div>
+            <div class="list"></div>
             <div class="w-line"></div>
         </div>
         <nav>
@@ -34,6 +25,9 @@ content %}
             <div class="resize-handle"><i class="iconoir-menu"></i></div>
             <div class="input-area">
                 <textarea rows="1" id="inputMessage" placeholder="Введите сообщение..." inputmode="text"></textarea>
+                <button id="exec" class="hidden" title="Выполнить команду">
+                    <i class="iconoir-send"></i>
+                </button>
                 <button id="reset" class="ghost">
                     <i class="iconoir-xmark"></i>
                 </button>
@@ -43,6 +37,7 @@ content %}
 </main>
 
 <script type="module" src="{{ url_for('static', filename='scripts/message/main.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='scripts/message/commands.js') }}" defer></script>
 <script src="{{ url_for('static', filename='scripts/share.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/ui/resize.js') }}"></script>
 <script src="{{ url_for('static', filename='scripts/ui/notification.js') }}" defer></script>

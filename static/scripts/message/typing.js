@@ -1,4 +1,4 @@
-export function server_command(text, elementId = "displayMessage", speed = 50) {
+export function server_command(text, speed = 50, elementId = "displayMessage") {
     const el = document.getElementById(elementId);
     if (!el) return;
     // ensure content is wrapped in <b> and type into that element
