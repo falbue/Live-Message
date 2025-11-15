@@ -129,6 +129,7 @@ button.ghost,
     justify-content: space-between;
     min-height: 400px;
     box-sizing: border-box;
+    padding: 20px 0;
 }
 
 .hero::before {
@@ -176,7 +177,7 @@ button.ghost,
     border-radius: 4px;
     cursor: pointer;
     display: flex;
-    gap: 8px;
+    gap: 16px;
     align-items: center;
 }
 
@@ -223,6 +224,7 @@ nav>.buttons {
     align-items: center;
     justify-content: center;
     color: var(--text-color);
+    padding-bottom: 8px;
 }
 
 .input-area {
