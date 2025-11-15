@@ -1,17 +1,23 @@
 function notification(message, isError = false) {
-  const notification = document.getElementById("notification");
+  const existing = document.getElementById("notification");
+  if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+
+  const notification = document.createElement("div");
+  notification.id = "notification";
+  notification.className = "notification";
+  if (isError) notification.classList.add("error");
   notification.textContent = message;
+  notification.classList.add("show");
 
-  notification.className = "notification show";
-
-  if (isError) {
-    notification.classList.add("error");
-    setTimeout(() => {
-      notification.className = "notification error";
-    }, 3000);
+  const appendNow = () => document.body.appendChild(notification);
+  if (document.body) {
+    appendNow();
   } else {
-    setTimeout(() => {
-      notification.className = "notification";
-    }, 3000);
+    document.addEventListener("DOMContentLoaded", appendNow, { once: true });
   }
+
+  const removeAfterMs = 3000;
+  setTimeout(() => {
+    if (notification.parentNode) notification.parentNode.removeChild(notification);
+  }, removeAfterMs);
 }
