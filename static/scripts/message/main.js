@@ -5,19 +5,34 @@ import { server_command } from './typing.js';
 const chatId = window.location.pathname.split('/').pop();
 const inputMessage = document.getElementById('inputMessage');
 const displayMessage = document.getElementById('displayMessage');
-const senderId = Math.random().toString(36).substr(2, 9);
+const getUsername = () => localStorage.getItem('username') || '';
+
+let senderId = null;
+try {
+    senderId = localStorage.getItem('senderId');
+} catch (e) {
+    senderId = null;
+}
+if (!senderId) {
+    senderId = Math.random().toString(36).substr(2, 9);
+    try { localStorage.setItem('senderId', senderId); } catch (e) { /* ignore */ }
+}
+
 
 const sc = createSocket();
-sc.emitUpdate({ chat_id: chatId, text: 'server: Пользователь подключился!', sender_id: senderId });
+sc.emitUpdate({ chat_id: chatId, text: `Пользователь **${getUsername()}** подключился`, sender_id: senderId });
 
 inputMessage?.addEventListener('input', () => {
-    const messageText = inputMessage.value.trim() || '...';
+    let messageText = inputMessage.value.trim() || '...';
+    const username = getUsername();
+    if (username) {
+        messageText = `**${username}:** ` + messageText;
+    }
     sc.emitUpdate({ chat_id: chatId, text: messageText, sender_id: senderId });
 });
 
 sc.onReceive((data) => {
     if (data.sender_id === senderId) return;
-    if (!displayMessage) return;
     displayMessage.innerHTML = formatMessage(data.text);
     const codeBlocks = displayMessage.querySelectorAll('pre code');
     if (window.hljs && codeBlocks.length) {
@@ -38,5 +53,18 @@ document.addEventListener('DOMContentLoaded', () => {
         })(chatId);
         copyEl.textContent = mask;
         copyEl.setAttribute('data-full', chatId);
+    }
+});
+
+// React to username changes from other tabs/windows.
+window.addEventListener('storage', (e) => {
+    if (e.key === 'username') {
+        const newName = e.newValue || '';
+        server_command(`Имя пользователя обновлено: ${newName}`);
+        try {
+            sc.emitUpdate({ chat_id: chatId, text: `Пользователь ${newName || 'аноним'} обновил имя`, sender_id: senderId });
+        } catch (err) {
+            // ignore if socket not ready
+        }
     }
 });
