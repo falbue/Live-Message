@@ -20,7 +20,7 @@ if (!senderId) {
 
 
 const sc = createSocket();
-sc.emitUpdate({ chat_id: chatId, text: `Пользователь **${getUsername()}** подключился`, sender_id: senderId });
+sc.emitUpdate({ chat_id: chatId, text: `Пользователь ${getUsername()} подключился`, sender_id: senderId });
 
 inputMessage?.addEventListener('input', () => {
     let messageText = inputMessage.value.trim() || '...';
