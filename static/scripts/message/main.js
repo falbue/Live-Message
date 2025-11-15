@@ -19,8 +19,15 @@ if (!senderId) {
 }
 
 
+
 const sc = createSocket();
-sc.emitUpdate({ chat_id: chatId, text: `Пользователь ${getUsername()} подключился`, sender_id: senderId });
+export function sendMessage(text) {
+    const messageText = String(text ?? '');
+    if (typeof sc?.emitUpdate !== 'function') return;
+    sc.emitUpdate({ chat_id: chatId, text: messageText, sender_id: senderId });
+}
+
+sendMessage(`Пользователь ${getUsername()} подключился`);
 
 inputMessage?.addEventListener('input', () => {
     let messageText = inputMessage.value.trim() || '...';
@@ -28,7 +35,7 @@ inputMessage?.addEventListener('input', () => {
     if (username) {
         messageText = `**${username}:** ` + messageText;
     }
-    sc.emitUpdate({ chat_id: chatId, text: messageText, sender_id: senderId });
+    sendMessage(messageText);
 });
 
 sc.onReceive((data) => {
