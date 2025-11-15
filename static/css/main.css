@@ -110,7 +110,7 @@ button.ghost,
     min-width: 250px;
     inset: 20px auto auto 50%;
     transform: translateX(-50%);
-    background-color: var(--button);
+    background-color: var(--input);
     padding: 10px 20px;
     border-radius: 12px;
     z-index: 9999;
@@ -122,7 +122,7 @@ button.ghost,
     font-size: 1.2rem;
     text-align: center;
     color: var(--text-color);
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--button);
 }
 
 .hero {
@@ -160,9 +160,11 @@ button.ghost,
 
 .input-message {
     padding: 8px 16px;
+    padding-bottom: 16px;
     position: relative;
     display: flex;
     flex-direction: column;
+    gap: 8px;
     background-color: var(--input);
     border-radius: 12px 12px 0 0;
     box-shadow: 0px -6px 12px 0px rgba(0, 0, 0, 0.25);
@@ -174,7 +176,6 @@ nav {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 6px 0;
     box-sizing: border-box;
     margin-right: auto;
 }
