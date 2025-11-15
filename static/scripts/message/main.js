@@ -59,12 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // React to username changes from other tabs/windows.
 window.addEventListener('storage', (e) => {
     if (e.key === 'username') {
-        const newName = e.newValue || '';
-        server_command(`Имя пользователя обновлено: ${newName}`);
-        try {
-            sc.emitUpdate({ chat_id: chatId, text: `Пользователь ${newName || 'аноним'} обновил имя`, sender_id: senderId });
-        } catch (err) {
-            // ignore if socket not ready
-        }
+        notification(`Имя пользователя обновлено`);
     }
 });
