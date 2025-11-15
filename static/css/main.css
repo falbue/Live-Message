@@ -1,5 +1,6 @@
 @import url("animation.css");
 @import url("variables.css");
+@import url("commands.css");
 
 * {
     padding: 0;
@@ -58,6 +59,7 @@ h3 {
 h1,
 h2,
 h3,
+h4,
 p {
     color: var(--text-color);
 }
@@ -92,6 +94,15 @@ button,
 button>i,
 .button>i {
     font-size: 1.2rem;
+}
+
+button.ghost,
+.button.ghost {
+    background: none;
+    box-shadow: none;
+    opacity: 0.2;
+    /* color: rgba(0, 0, 0, 0.5); */
+
 }
 
 .notification {
@@ -148,6 +159,7 @@ button>i,
 }
 
 .input-message {
+    padding: 8px 16px;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -162,7 +174,7 @@ nav {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 6px;
+    padding: 6px 0;
     box-sizing: border-box;
     margin-right: auto;
 }
@@ -193,15 +205,21 @@ nav>.buttons {
     color: var(--text-color);
 }
 
+.input-area {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    box-sizing: border-box;
+}
+
 textarea {
     background-color: var(--input);
     color: var(--text-color);
     font-size: 1.4rem;
-    padding: 20px;
     width: 100%;
     border: none;
     box-sizing: border-box;
-    min-height: 1.2em;
+    min-height: 43px;
     max-height: 40dvh;
     line-height: 1.2em;
     resize: none;
@@ -212,17 +230,13 @@ textarea:focus {
     outline: none;
 }
 
+textarea::placeholder {
+    position: absolute;
+    bottom: 20px;
+    font-size: 1.4rem;
+}
+
 @media (max-width: 768px) {
-    textarea::placeholder {
-        position: absolute;
-        bottom: 20px;
-        font-size: 1.4rem;
-    }
-
-    nav {
-        bottom: 100px !important;
-    }
-
     textarea {
         font-size: 1.2rem;
     }

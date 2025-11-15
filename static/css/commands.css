@@ -1,0 +1,16 @@
+.commands {
+    padding: 6px 0;
+}
+
+.commands>.list {
+    padding: 6px 0;
+}
+
+.commands>.list>.item {
+    padding: 10px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
