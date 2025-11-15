@@ -1,10 +1,8 @@
-import { server_command } from './typing.js';
+import { server_command } from './message/typing.js';
+import commands from './commands/index.js';
 
 (function () {
-    const commands = [
-        { name: '/help', desc: 'Помощь' },
-        { name: '/username', desc: 'Сменить имя пользователя' }
-    ];
+    // `commands` imported from `./commands/index.js`
 
     const el = {
         commandsWrap: document.querySelector('.commands'),
@@ -35,7 +33,7 @@ import { server_command } from './typing.js';
         if (filtered.length === 0) {
             const empty = document.createElement('div');
             empty.className = 'item empty';
-            empty.innerHTML = '<p class="desc">Команд не найдено</p>';
+            empty.innerHTML = '<p class="desc">Команды отсутствуют</p>';
             el.list.appendChild(empty);
             return;
         }
@@ -120,46 +118,16 @@ import { server_command } from './typing.js';
         renderList();
     }
 
-    // Сами команды
-    const handlers = {
-        '/help': () => {
-            const lines = commands.map(c => `${c.name} — ${c.desc || ''}`).join('\n');
-            server_command(lines);
-        },
-        '/username': () => {
-            // Прочитать введённую строку и взять всё, что идёт после команды
-            const raw = (el.input && el.input.value) ? el.input.value.trim() : '';
-            const parts = raw.split(/\s+/);
-            const name = parts.slice(1).join(' ').trim();
-            if (!name) {
-                const msg = 'Укажите имя пользователя после команды, например: /username Иван';
-                notification(msg);
-                server_command(msg, 10);
-                return;
-            }
-            try {
-                localStorage.setItem('username', name);
-                const msg = `Имя пользователя установлено: ${name}`;
-                server_command(msg);
-                notification(msg);
-                if (el.input) el.input.value = '';
-            } catch (e) {
-                console.error(e);
-                const err = 'Не удалось сохранить имя пользователя';
-                notification(err);
-                server_command(err);
-            }
-        }
-    };
+    // Команды реализуются в отдельных модулях в `./commands/`
 
     function executeCurrent() {
         const value = (el.input.value || '').trim();
         const token = value.split(/\s+/)[0] || '';
         if (!token.startsWith('/')) return false;
-        const handler = handlers[token];
-        if (handler) {
+        const cmd = (commands || []).find(c => c && c.name === token);
+        if (cmd && typeof cmd.execute === 'function') {
             try {
-                handler();
+                cmd.execute({ el, notification, server_command, commands });
             } catch (e) {
                 console.error(e);
                 notification('Ошибка при выполнении команды');
