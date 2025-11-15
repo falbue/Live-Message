@@ -1,6 +1,6 @@
 import { formatMessage } from './helpers.js';
 import { createSocket } from '../socket-client.js';
-import { typeText } from './typing.js';
+import { server_command } from './typing.js';
 
 const chatId = window.location.pathname.split('/').pop();
 const inputMessage = document.getElementById('inputMessage');
@@ -8,7 +8,7 @@ const displayMessage = document.getElementById('displayMessage');
 const senderId = Math.random().toString(36).substr(2, 9);
 
 const sc = createSocket();
-sc.emitUpdate({ chat_id: chatId, text: 'Пользователь подключился!', sender_id: senderId });
+sc.emitUpdate({ chat_id: chatId, text: 'server: Пользователь подключился!', sender_id: senderId });
 
 inputMessage?.addEventListener('input', () => {
     const messageText = inputMessage.value.trim() || '...';
@@ -28,7 +28,7 @@ sc.onReceive((data) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    typeText('displayMessage', 'Ожидание пользователя...');
+    server_command('Ожидание пользователя...');
     const copyEl = document.querySelector('.copy');
     if (copyEl && chatId) {
         const mask = (id => {

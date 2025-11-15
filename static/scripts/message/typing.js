@@ -1,11 +1,15 @@
-export function typeText(elementId, text, speed = 100) {
-    const el = document.querySelector(`#${elementId} b`);
+export function server_command(text, elementId = "displayMessage", speed = 50) {
+    const el = document.getElementById(elementId);
     if (!el) return;
-    el.textContent = '';
+    // ensure content is wrapped in <b> and type into that element
+    el.innerHTML = '<b></b>';
+    const b = el.querySelector('b');
+    if (!b) return;
+    b.textContent = '';
     let i = 0;
     const interval = setInterval(() => {
         if (i < text.length) {
-            el.textContent += text.charAt(i++);
+            b.textContent += text.charAt(i++);
         } else {
             clearInterval(interval);
         }
