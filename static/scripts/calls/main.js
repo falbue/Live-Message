@@ -5,36 +5,24 @@ let joined = false;
 let currentCount = 0;
 const pcs = {}; // RTCPeerConnections by peer id (sid)
 let localStream = null;
-let isListener = false;
 
 const audioBtn = document.getElementById('audioCallButton');
 const copyTitle = document.querySelector('h3.inline.copy');
 
-function updateUI() {
-    if (!audioBtn) return;
-    if (joined) {
-        audioBtn.title = isListener ? 'Выйти из звонка (слушатель)' : 'Выйти из звонка';
-        audioBtn.innerHTML = '<i class="iconoir-phone-disabled"></i>';
-    } else {
-        audioBtn.title = 'Войти в звонок';
-        audioBtn.innerHTML = '<i class="iconoir-phone"></i>';
-    }
-    if (copyTitle) copyTitle.textContent = joined ? `В звонке${isListener ? ' (слушатель)' : ''} (${currentCount})` : '';
-}
-
 async function ensureLocalStream() {
     if (localStream) return localStream;
     try {
-        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        isListener = false;
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // По умолчанию микрофон выключаем (пользователь включит сам)
+        for (const t of stream.getAudioTracks()) t.enabled = false;
+        localStream = stream;
         return localStream;
     } catch (err) {
-        console.warn('Не удалось получить доступ к микрофону — подключаемся как слушатель', err);
-        // Не прерываем соединение: работаем в режиме слушателя (recvonly)
+        console.warn('Не удалось получить доступ к микрофону — останемся без микрофона', err);
+        // Не прерываем соединение: работаем без микрофона
         localStream = null;
-        isListener = true;
         // Короткое уведомление пользователю
-        alert('Микрофон не найден или доступ запрещён. Вы подключитесь как слушатель и будете слышать других участников.');
+        alert('Микрофон не найден или доступ запрещён. Вы подключитесь без микрофона и будете только слушать других участников.');
         return null;
     }
 }
@@ -83,7 +71,11 @@ async function joinCall() {
 
     // Попытаться получить микрофон; если не получилось — работать в режиме слушателя
     await ensureLocalStream();
-    socket.emit('join_call', { chat_id, listener: !!isListener });
+    socket.emit('join_call', { chat_id });
+    // Показать кнопку микрофона (удалить скрывающий класс) — пользователь сам решит включать микрофон
+    const muteBtn = document.getElementById('muteButton');
+    if (muteBtn) muteBtn.classList.remove('hidden');
+    updateUI();
 }
 
 function closeAllPeerConnections() {
@@ -222,4 +214,73 @@ if (socket) {
     });
 }
 
+// UI updates including mute button state
+function updateUI() {
+    if (!audioBtn) return;
+    if (joined) {
+        audioBtn.title = 'Выйти из звонка';
+        audioBtn.innerHTML = '<i class="iconoir-phone-disabled"></i>';
+    } else {
+        audioBtn.title = 'Войти в звонок';
+        audioBtn.innerHTML = '<i class="iconoir-phone"></i>';
+    }
+    if (copyTitle) copyTitle.textContent = joined ? `В звонке (${currentCount})` : '';
+
+    const muteBtn = document.getElementById('muteButton');
+    if (muteBtn) {
+        // Показать/скрыть кнопку микрофона только при подключении
+        if (joined) muteBtn.classList.remove('hidden');
+        else muteBtn.classList.add('hidden');
+
+        // Обновить состояние иконки в зависимости от наличия и состояния трека
+        const hasStream = !!localStream;
+        const enabled = hasStream && localStream.getAudioTracks().some((t) => t.enabled);
+        if (!hasStream) {
+            muteBtn.title = 'Включить микрофон (попробовать подключить)';
+            muteBtn.innerHTML = '<i class="iconoir-microphone-mute-solid"></i>';
+        } else if (enabled) {
+            muteBtn.title = 'Выключить микрофон';
+            muteBtn.innerHTML = '<i class="iconoir-microphone"></i>';
+        } else {
+            muteBtn.title = 'Включить микрофон';
+            muteBtn.innerHTML = '<i class="iconoir-microphone-mute-solid"></i>';
+        }
+    }
+}
+
+// Обработчик кнопки микрофона: попытка включить/выключить микрофон
+const muteBtnEl = document.getElementById('muteButton');
+if (muteBtnEl) {
+    muteBtnEl.addEventListener('click', async () => {
+        // Если нет локального стрима — попытаться получить
+        if (!localStream) {
+            try {
+                const stream = await ensureLocalStream();
+                if (stream) {
+                    // Добавить треки к уже существующим соединениям
+                    for (const pid of Object.keys(pcs)) {
+                        const pc = pcs[pid];
+                        for (const t of stream.getTracks()) pc.addTrack(t, stream);
+                    }
+                }
+            } catch (err) {
+                // ensureLocalStream уже показывает alert, но на всякий случай лог
+                console.error('Ошибка при попытке получить микрофон', err);
+            }
+        }
+
+        if (localStream) {
+            // Переключаем enabled для всех аудиотреков
+            const tracks = localStream.getAudioTracks();
+            const anyEnabled = tracks.some((t) => t.enabled);
+            for (const t of tracks) t.enabled = !anyEnabled;
+            updateUI();
+        } else {
+            // Нет микрофона — оставляем пользователя слушать
+            alert('Микрофон не доступен. Вы остаетесь без микрофона.');
+        }
+    });
+}
+
+// Вызвать первоначальное обновление UI
 updateUI();
