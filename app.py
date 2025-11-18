@@ -52,9 +52,11 @@ def handle_join_call(data):
     room.add(sid)
     SID_ROOMS.setdefault(sid, set()).add(chat_id)
     join_room(chat_id)
-    # notify the joining client and the room
+    # notify the joining client with existing peers and notify others
+    other_peers = [s for s in room if s != sid]
+    socketio.emit("peers", {"peers": other_peers}, to=sid)
     socketio.emit("call_joined", {"chat_id": chat_id, "count": len(room)}, to=sid)
-    socketio.emit("participant_joined", {"chat_id": chat_id, "count": len(room)}, to=chat_id)
+    socketio.emit("participant_joined", {"chat_id": chat_id, "count": len(room), "peer_id": sid}, room=chat_id, include_self=False)
 
 
 @socketio.on("leave_call")
@@ -73,6 +75,8 @@ def handle_leave_call(data):
         SID_ROOMS.get(sid, set()).discard(chat_id)
         leave_room(chat_id)
         socketio.emit("call_left", {"chat_id": chat_id, "count": len(room) if room else 0}, to=chat_id)
+        # notify peers that this sid left
+        socketio.emit("peer_left", {"peer_id": sid, "chat_id": chat_id, "count": len(room) if room else 0}, room=chat_id)
 
 
 @socketio.on("disconnect")
@@ -86,6 +90,23 @@ def handle_disconnect():
             if not room:
                 CALL_ROOMS.pop(chat_id, None)
             socketio.emit("call_left", {"chat_id": chat_id, "count": len(room) if room else 0}, to=chat_id)
+            socketio.emit("peer_left", {"peer_id": sid, "chat_id": chat_id, "count": len(room) if room else 0}, room=chat_id)
+
+
+@socketio.on("signal")
+def handle_signal(data):
+    """Relay WebRTC signaling payloads to target peer.
+
+    Expected data: { 'to': <sid>, 'payload': {...} }
+    The server simply forwards the payload and adds the `from` field.
+    """
+    target = data.get("to")
+    payload = data.get("payload")
+    if not target or not payload:
+        return
+
+    frm = request.sid
+    socketio.emit("signal", {"from": frm, "payload": payload}, to=target)
 
 
 if __name__ == "__main__":
