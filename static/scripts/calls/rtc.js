@@ -19,9 +19,6 @@ export function createPeerConnection(peerId, socket) {
         }
     ];
 
-    // TEMP LOG: выводим iceServers, чтобы убедиться что браузер загрузил актуальную версию скрипта
-    try { console.log('RTC: createPeerConnection', peerId, { iceServers }); } catch (e) { }
-
     const pc = new RTCPeerConnection({ iceServers });
 
     pc.ontrack = (ev) => {
