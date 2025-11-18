@@ -5,21 +5,24 @@ export const pcs = {}; // RTCPeerConnections by peer id (sid)
 
 export function createPeerConnection(peerId, socket) {
     if (pcs[peerId]) return pcs[peerId];
-    const pc = new RTCPeerConnection({
-        iceServers: [
-            { urls: "stun:stun.l.google.com:19302" },
-            {
-                urls: ["turn:turn.falbue.ru:3478"],
-                username: "turnuser",
-                credential: "StrongPass123"
-            },
-            {
-                urls: ["turns:turn.falbue.ru:5349"],
-                username: "turnuser",
-                credential: "StrongPass123"
-            }
-        ]
-    });
+    const iceServers = [
+        { urls: "stun:stun.l.google.com:19302" },
+        {
+            urls: ["turn:turn.falbue.ru:3478"],
+            username: "turnuser",
+            credential: "StrongPass123"
+        },
+        {
+            urls: ["turns:turn.falbue.ru:5349"],
+            username: "turnuser",
+            credential: "StrongPass123"
+        }
+    ];
+
+    // TEMP LOG: выводим iceServers, чтобы убедиться что браузер загрузил актуальную версию скрипта
+    try { console.log('RTC: createPeerConnection', peerId, { iceServers }); } catch (e) { }
+
+    const pc = new RTCPeerConnection({ iceServers });
 
     pc.ontrack = (ev) => {
         if (ev.streams && ev.streams[0]) {
