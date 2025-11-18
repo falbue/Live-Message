@@ -6,7 +6,19 @@ export const pcs = {}; // RTCPeerConnections by peer id (sid)
 export function createPeerConnection(peerId, socket) {
     if (pcs[peerId]) return pcs[peerId];
     const pc = new RTCPeerConnection({
-        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+        iceServers: [
+            { urls: "stun:stun.l.google.com:19302" },
+            {
+                urls: ["turn:turn.falbue.ru:3478"],
+                username: "turnuser",
+                credential: "StrongPass123"
+            },
+            {
+                urls: ["turns:turn.falbue.ru:5349"],
+                username: "turnuser",
+                credential: "StrongPass123"
+            }
+        ]
     });
 
     pc.ontrack = (ev) => {
