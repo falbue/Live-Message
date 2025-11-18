@@ -13,6 +13,21 @@ content %}
         <nav>
             <h3 class="inline copy"></h3>
             <div class="buttons">
+                <button id="muteButton" class="hidden">
+                    <i class="iconoir-microphone"></i>
+                </button>
+                <button id="videoCallButton" class="hidden">
+                    <i class="iconoir-video-camera"></i>
+                </button>
+                <button id="acceptCall" class="call-btn accept hidden">
+                    <i class="iconoir-phone"></i>
+                </button>
+                <button id="declineCall" class="call-btn decline hidden">
+                    <i class="iconoir-phone-disabled"></i>
+                </button>
+                <button id="audioCallButton">
+                    <i class="iconoir-phone"></i>
+                </button>
                 <button id="shareButton">
                     <i class="iconoir-share-android"></i>
                 </button>
@@ -40,4 +55,5 @@ content %}
 <script src="{{ url_for('static', filename='scripts/ui/notification.js') }}" defer></script>
 <script src="{{ url_for('static', filename='scripts/message/copy.js') }}" defer></script>
 <script src="{{ url_for('static', filename='scripts/ui/clear.js') }}" defer></script>
+<script src="{{ url_for('static', filename='scripts/calls/main.js') }}" defer></script>
 {% endblock %}
