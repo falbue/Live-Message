@@ -1,6 +1,6 @@
 // callManager.js — сигнализация, состояние звонка и обработчики сокета
 import socketClient from '../socket-client.js';
-import * as media from './media.js';
+import * as media from './microphone.js';
 import * as rtc from './rtc.js';
 import * as ui from './ui.js';
 
@@ -112,7 +112,8 @@ export async function joinCall() {
     const chat_id = window.CHAT_ID;
     if (!chat_id) return;
 
-    await media.ensureLocalStream();
+    // Не запрашиваем доступ к микрофону автоматически при входе в звонок.
+    // Микрофон должен быть запрошен только когда пользователь явным образом включит звук.
     socket.emit('join_call', { chat_id });
     ui.updateUI(joined, currentCount, media.getLocalStream());
 }
@@ -122,6 +123,10 @@ export function leaveCall() {
     const chat_id = window.CHAT_ID;
     if (!chat_id) return;
     socket.emit('leave_call', { chat_id });
+    // Удаляем локальные треки из всех peer connection и останавливаем локальный поток,
+    // чтобы освободить микрофон у браузера.
+    try { rtc.removeLocalTracksFromAll(media.getLocalStream()); } catch (e) { }
+    try { media.stopLocalStream(); } catch (e) { }
     rtc.closeAllPeerConnections();
     joined = false;
     currentCount = 0;
