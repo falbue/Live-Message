@@ -1,49 +1,56 @@
 :root {
-  --ligth: #CDBCE2;
-  --ligth2: #AF99CC;
-  --dark: #1A1A36;
-  --dark2: #2E2661;
-  --black: #1A1A1A;
-  --white: #E8D7FF;
+    --deep-navy: #191520;
+    --deep-indigo: #221e2a;
+    --soft-purple: #AF99CC;
+    --pale-mauve: #CDBCE2;
+
+    --white: #f1f1f1;
+    --red: #f44336;
+    --green: #4caf50;
+
+    --vh: 100dvh;
+    --button: var(--soft-purple);
 }
 
-
 @media (prefers-color-scheme: light) {
-  :root {
-    --bg-color: var(--black);
-    --text-color: var(--black);
-    --button: var(--ligth2);
-    --backgrond: var(--ligth);
-    --input: var(--white);
-  }
+    :root {
+        --text-color: var(--deep-navy);
+        --background: var(--pale-mauve);
+        --input: Var(--white)
+    }
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --text-color: var(--white);
-    --bg-color: var(--white);
-    --button: var(--dark2);
-    --backgrond: var(--dark);
-    --input: var(--black);
-  }
+    :root {
+        --text-color: var(--white);
+        --background: var(--deep-navy);
+        --input: var(--deep-indigo);
+    }
 }
 
-.center{
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hidden {
     visibility: hidden !important;
-    width: 0;
-    height: 0;
-    padding: 0;
-    margin: 0;
+    padding: 0 !important;
+    margin: 0 !important;
     font-size: 0;
+    opacity: 0;
+    pointer-events: none !important;
+    height: 0 !important;
+    width: 0 !important;
 }
 
-.show{
-  visibility: visible !important;
-  opacity: 1 !important;
+.show {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.w-line {
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.2);
 }

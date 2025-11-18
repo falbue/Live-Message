@@ -1,4 +1,4 @@
-Flask
-Flask-SocketIO
+flask
+flask-socketio
 eventlet
-python-dotenv
+uuid

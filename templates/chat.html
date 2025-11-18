@@ -1,35 +1,43 @@
-{% extends "base.html" %}
-
-{% block title %}Live Message{% endblock %}
-
-{% block content %}
-<div id="notification" class="notification"></div>
+{% extends "base.html" %} {% block title %}Life Message{% endblock %} {% block
+content %}
 <main>
     <div class="chat">
-        <p id="displayMessage"><b></b></p>
+        <p id="displayMessage"></p>
     </div>
-    
-    <textarea id="inputMessage" placeholder="Введите сообщение..." inputmode="text"></textarea>
 
-    <nav>
-        <div id="videoContainer" class="hidden">
-            <video id="localVideo" autoplay muted playsinline></video>
-            <video id="remoteVideo" autoplay playsinline></video>
+    <div class="input-message">
+        <div class="commands hidden">
+            <div class="list"></div>
+            <div class="w-line"></div>
         </div>
-        
-        <div class="buttons">
-            <button id="acceptCall" class="call-btn accept hidden"><i class="iconoir-phone"></i></button>
-            <button id="declineCall" class="call-btn decline hidden"><i class="iconoir-phone-disabled"></i></button>
-            <button id="endCall" class="call-btn end hidden"><i class="iconoir-phone-disabled"></i></button>
-            <button id="audioCallButton"><i class="iconoir-phone"></i></button>
-            <button id="videoCallButton"><i class="iconoir-camera"></i></button>
-            <button id="shareButton"><i class="iconoir-share-android"></i></button>
+        <nav>
+            <h3 class="inline copy"></h3>
+            <div class="buttons">
+                <button id="shareButton">
+                    <i class="iconoir-share-android"></i>
+                </button>
+            </div>
+        </nav>
+        <div class="textarea-wrapper">
+            <div class="resize-handle"><i class="iconoir-menu"></i></div>
+            <div class="input-area">
+                <textarea rows="1" id="inputMessage" placeholder="Введите сообщение..." inputmode="text"></textarea>
+                <button id="exec" class="hidden" title="Выполнить команду">
+                    <i class="iconoir-send"></i>
+                </button>
+                <button id="reset" class="ghost">
+                    <i class="iconoir-xmark"></i>
+                </button>
+            </div>
         </div>
-    </nav>
+    </div>
 </main>
 
-<script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
-<script src="{{ url_for('static', filename='scripts/calls.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='scripts/message/main.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='scripts/dispatch.js') }}" defer></script>
 <script src="{{ url_for('static', filename='scripts/share.js') }}"></script>
-<script src="{{ url_for('static', filename='scripts/notification.js') }}" defer></script>
+<script src="{{ url_for('static', filename='scripts/ui/resize.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/ui/notification.js') }}" defer></script>
+<script src="{{ url_for('static', filename='scripts/message/copy.js') }}" defer></script>
+<script src="{{ url_for('static', filename='scripts/ui/clear.js') }}" defer></script>
 {% endblock %}
