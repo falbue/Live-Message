@@ -122,7 +122,23 @@ export function leaveCall() {
     const chat_id = window.CHAT_ID;
     if (!chat_id) return;
     socket.emit('leave_call', { chat_id });
+    // Закрываем peer-соединения
     rtc.closeAllPeerConnections();
+
+    // Останавливаем локальные медиатреки (микрофон/камера) и очищаем поток
+    try {
+        const localStream = media.getLocalStream();
+        if (localStream) {
+            for (const t of localStream.getTracks()) {
+                try { t.stop(); } catch (e) { /* ignore */ }
+            }
+            // Сбрасываем ссылку в модуле media
+            media.setLocalStream(null);
+        }
+    } catch (e) {
+        console.warn('Ошибка при остановке локального потока', e);
+    }
+
     joined = false;
     currentCount = 0;
     ui.updateUI(joined, currentCount, media.getLocalStream());
