@@ -12,7 +12,6 @@ export async function ensureLocalStream() {
     } catch (err) {
         console.warn('Не удалось получить доступ к микрофону — останемся без микрофона', err);
         localStream = null;
-        alert('Микрофон не найден или доступ запрещён. Вы подключитесь без микрофона и будете только слушать других участников.');
         return null;
     }
 }

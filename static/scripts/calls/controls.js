@@ -33,7 +33,7 @@ if (muteBtnEl) {
             for (const t of tracks) t.enabled = !anyEnabled;
             ui.updateUI(callManager.isJoined(), callManager.getCurrentCount(), localStream);
         } else {
-            alert('Микрофон не доступен. Вы остаетесь без микрофона.');
+            notification('Микрофон не доступен');
         }
     });
 }

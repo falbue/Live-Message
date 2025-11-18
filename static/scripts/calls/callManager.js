@@ -14,11 +14,6 @@ export function getCurrentCount() { return currentCount; }
 export function initCallManager() {
     if (!socket) return;
 
-    socket.on('call_full', (data) => {
-        console.warn('Call full', data);
-        alert('В комнате звонка уже 12 участников — место занято.');
-    });
-
     socket.on('call_joined', (data) => {
         joined = true;
         currentCount = data.count || currentCount;

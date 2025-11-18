@@ -44,10 +44,6 @@ def handle_join_call(data):
 
     sid = request.sid
     room = CALL_ROOMS.setdefault(chat_id, set())
-    # enforce max participants
-    if len(room) >= 12:
-        socketio.emit("call_full", {"chat_id": chat_id}, to=sid)
-        return
 
     room.add(sid)
     SID_ROOMS.setdefault(sid, set()).add(chat_id)

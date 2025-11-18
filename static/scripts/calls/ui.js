@@ -1,6 +1,5 @@
 // ui.js — DOM-операции и обновление интерфейса
 const audioBtn = document.getElementById('audioCallButton');
-const copyTitle = document.querySelector('h3.inline.copy');
 
 export function createAudioElementForStream(stream, peerId) {
     const audio = document.createElement('audio');
@@ -25,7 +24,6 @@ export function updateUI(joined, currentCount, localStream) {
         audioBtn.title = 'Войти в звонок';
         audioBtn.innerHTML = '<i class="iconoir-phone"></i>';
     }
-    if (copyTitle) copyTitle.textContent = joined ? `В звонке (${currentCount})` : '';
 
     const muteBtn = document.getElementById('muteButton');
     if (muteBtn) {
