@@ -1,6 +1,6 @@
 import { formatMessage } from './helpers.js';
 import { createSocket } from '../socket-client.js';
-import { server_command } from './typing.js';
+import { server_command } from './server-command.js';
 
 const chatId = window.location.pathname.split('/').pop();
 const inputMessage = document.getElementById('inputMessage');

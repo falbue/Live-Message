@@ -1,5 +1,5 @@
-import { server_command } from './message/typing.js';
-import commands from './commands/index.js';
+import { server_command } from '../message/typing.js';
+import commands from './index.js';
 
 (function () {
     // `commands` imported from `./commands/index.js`
