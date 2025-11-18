@@ -1,4 +1,4 @@
-import { server_command } from '../message/typing.js';
+import { server_command } from '../message/server-command.js';
 import commands from './index.js';
 
 (function () {

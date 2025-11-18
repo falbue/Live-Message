@@ -1,5 +1,5 @@
 import { formatMessage } from './helpers.js';
-import { createSocket } from '../socket-client.js';
+import socketClient from '../socket-client.js';
 import { server_command } from './server-command.js';
 
 const chatId = window.location.pathname.split('/').pop();
@@ -20,7 +20,7 @@ if (!senderId) {
 
 
 
-const sc = createSocket();
+const sc = socketClient;
 export function sendMessage(text) {
     const messageText = String(text ?? '');
     if (typeof sc?.emitUpdate !== 'function') return;
@@ -60,12 +60,5 @@ document.addEventListener('DOMContentLoaded', () => {
         })(chatId);
         copyEl.textContent = mask;
         copyEl.setAttribute('data-full', chatId);
-    }
-});
-
-// React to username changes from other tabs/windows.
-window.addEventListener('storage', (e) => {
-    if (e.key === 'username') {
-        notification(`Имя пользователя обновлено`);
     }
 });
