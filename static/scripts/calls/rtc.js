@@ -62,20 +62,3 @@ export function addLocalTracksToAll(stream) {
         for (const t of stream.getTracks()) pc.addTrack(t, stream);
     }
 }
-
-export function removeLocalTracksFromAll(stream) {
-    if (!stream) return;
-    const trackIds = new Set(stream.getTracks().map(t => t.id));
-    for (const pid of Object.keys(pcs)) {
-        const pc = pcs[pid];
-        try {
-            const senders = pc.getSenders ? pc.getSenders() : [];
-            for (const sender of senders) {
-                if (!sender || !sender.track) continue;
-                if (trackIds.has(sender.track.id)) {
-                    try { pc.removeTrack(sender); } catch (e) { }
-                }
-            }
-        } catch (e) { }
-    }
-}
