@@ -3,9 +3,7 @@ from flask import Flask, render_template
 from flask_socketio import SocketIO, join_room, leave_room
 from flask import request
 
-# In-memory tracking of call room participants: {chat_id: set(sid)}
 CALL_ROOMS = {}
-# Reverse map: {sid: set(chat_id)}
 SID_ROOMS = {}
 
 app = Flask(__name__)
@@ -48,7 +46,7 @@ def handle_join_call(data):
     room.add(sid)
     SID_ROOMS.setdefault(sid, set()).add(chat_id)
     join_room(chat_id)
-    # notify the joining client with existing peers and notify others
+
     other_peers = [s for s in room if s != sid]
     socketio.emit("peers", {"peers": other_peers}, to=sid)
     socketio.emit("call_joined", {"chat_id": chat_id, "count": len(room)}, to=sid)
@@ -66,12 +64,10 @@ def handle_leave_call(data):
     if room and sid in room:
         room.discard(sid)
         if not room:
-            # remove empty room entry
             CALL_ROOMS.pop(chat_id, None)
         SID_ROOMS.get(sid, set()).discard(chat_id)
         leave_room(chat_id)
         socketio.emit("call_left", {"chat_id": chat_id, "count": len(room) if room else 0}, to=chat_id)
-        # notify peers that this sid left
         socketio.emit("peer_left", {"peer_id": sid, "chat_id": chat_id, "count": len(room) if room else 0}, room=chat_id)
 
 
@@ -91,11 +87,6 @@ def handle_disconnect():
 
 @socketio.on("signal")
 def handle_signal(data):
-    """Relay WebRTC signaling payloads to target peer.
-
-    Expected data: { 'to': <sid>, 'payload': {...} }
-    The server simply forwards the payload and adds the `from` field.
-    """
     target = data.get("to")
     payload = data.get("payload")
     if not target or not payload:
@@ -106,4 +97,4 @@ def handle_signal(data):
 
 
 if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=1100, debug=True)
+    socketio.run(app, host="0.0.0.0", port=1100, debug=False)
