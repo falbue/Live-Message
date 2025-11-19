@@ -5,8 +5,8 @@ export async function ensureLocalStream() {
     if (localStream) return localStream;
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        // По умолчанию микрофон выключаем (пользователь включит сам)
-        for (const t of stream.getAudioTracks()) t.enabled = false;
+        // По умолчанию микрофон включен
+        for (const t of stream.getAudioTracks()) t.enabled = true;
         localStream = stream;
         return localStream;
     } catch (err) {
